@@ -217,7 +217,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-aura-room-speaker",
     slug: "aura-room-speaker",
     title: "Aura Room Speaker",
-    description: "Multi-room speaker with balanced mids and clean aluminum trim.",
+    description:
+      "Multi-room speaker with balanced mids and clean aluminum trim.",
     category: "speakers",
     price: 229,
     originalPrice: 299,
@@ -267,7 +268,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-ember-portable-speaker",
     slug: "ember-portable-speaker",
     title: "Ember Portable Speaker",
-    description: "Splash-ready speaker built for patios, parks, and weekend trips.",
+    description:
+      "Splash-ready speaker built for patios, parks, and weekend trips.",
     category: "speakers",
     price: 149,
     originalPrice: 189,
@@ -334,7 +336,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-halo-sleep-ring",
     slug: "halo-sleep-ring",
     title: "Halo Sleep Ring",
-    description: "Minimal wellness ring with recovery and sleep readiness insights.",
+    description:
+      "Minimal wellness ring with recovery and sleep readiness insights.",
     category: "wearables",
     price: 229,
     originalPrice: 279,
@@ -368,7 +371,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-stride-clip-tracker",
     slug: "stride-clip-tracker",
     title: "Stride Clip Tracker",
-    description: "Compact recovery and mobility tracker for daily movement goals.",
+    description:
+      "Compact recovery and mobility tracker for daily movement goals.",
     category: "wearables",
     price: 69,
     originalPrice: 89,
@@ -385,7 +389,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-focus-desk-lamp",
     slug: "focus-desk-lamp",
     title: "Focus Desk Lamp",
-    description: "Soft-edge task lighting with touch dimming and wireless charging.",
+    description:
+      "Soft-edge task lighting with touch dimming and wireless charging.",
     category: "workspace",
     price: 139,
     originalPrice: 179,
@@ -401,7 +406,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-studio-webcam-pro",
     slug: "studio-webcam-pro",
     title: "Studio Webcam Pro",
-    description: "4K webcam with natural tone balance and quiet framing controls.",
+    description:
+      "4K webcam with natural tone balance and quiet framing controls.",
     category: "workspace",
     price: 179,
     originalPrice: 229,
@@ -418,7 +424,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-quiet-mech-keyboard",
     slug: "quiet-mech-keyboard",
     title: "Quiet Mech Keyboard",
-    description: "Low-profile tactile board with muted switches and aluminum frame.",
+    description:
+      "Low-profile tactile board with muted switches and aluminum frame.",
     category: "workspace",
     price: 159,
     originalPrice: 209,
@@ -452,7 +459,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-note-flow-tablet",
     slug: "note-flow-tablet",
     title: "Note Flow Tablet",
-    description: "Paper-feel digital notebook for planning, sketching, and review.",
+    description:
+      "Paper-feel digital notebook for planning, sketching, and review.",
     category: "workspace",
     price: 299,
     originalPrice: 369,
@@ -469,7 +477,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-rest-sound-machine",
     slug: "rest-sound-machine",
     title: "Rest Sound Machine",
-    description: "Compact bedside audio with layered sleep scenes and sunrise alarms.",
+    description:
+      "Compact bedside audio with layered sleep scenes and sunrise alarms.",
     category: "wellness",
     price: 89,
     originalPrice: 119,
@@ -485,7 +494,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-breathe-diffuser",
     slug: "breathe-diffuser",
     title: "Breathe Diffuser",
-    description: "Ceramic diffuser with silent mist output and soft ambient light.",
+    description:
+      "Ceramic diffuser with silent mist output and soft ambient light.",
     category: "wellness",
     price: 69,
     originalPrice: 99,
@@ -502,7 +512,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-calm-therapy-mask",
     slug: "calm-therapy-mask",
     title: "Calm Therapy Mask",
-    description: "Heated eye mask with pressure relief and guided wind-down modes.",
+    description:
+      "Heated eye mask with pressure relief and guided wind-down modes.",
     category: "wellness",
     price: 129,
     originalPrice: 169,
@@ -519,7 +530,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-thermo-recovery-gun",
     slug: "thermo-recovery-gun",
     title: "Thermo Recovery Gun",
-    description: "Hot-cold recovery tool with quieter percussion and ergonomic grip.",
+    description:
+      "Hot-cold recovery tool with quieter percussion and ergonomic grip.",
     category: "wellness",
     price: 199,
     originalPrice: 249,
@@ -536,7 +548,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-drift-sleep-speaker",
     slug: "drift-sleep-speaker",
     title: "Drift Sleep Speaker",
-    description: "Fabric bedside speaker tuned for gentle ambient playlists and stories.",
+    description:
+      "Fabric bedside speaker tuned for gentle ambient playlists and stories.",
     category: "wellness",
     price: 149,
     originalPrice: 189,
@@ -553,7 +566,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-voyage-power-kit",
     slug: "voyage-power-kit",
     title: "Voyage Power Kit",
-    description: "Slim travel battery, cable kit, and wall adapter in one case.",
+    description:
+      "Slim travel battery, cable kit, and wall adapter in one case.",
     category: "travel",
     price: 119,
     originalPrice: 159,
@@ -569,7 +583,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-roam-pack-speaker",
     slug: "roam-pack-speaker",
     title: "Roam Pack Speaker",
-    description: "Compact speaker clipped for easy carry and long battery life.",
+    description:
+      "Compact speaker clipped for easy carry and long battery life.",
     category: "travel",
     price: 109,
     originalPrice: 149,
@@ -586,7 +601,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-air-fold-charger",
     slug: "air-fold-charger",
     title: "Air Fold Charger",
-    description: "Tri-fold charger for phone, watch, and earbuds with a tiny footprint.",
+    description:
+      "Tri-fold charger for phone, watch, and earbuds with a tiny footprint.",
     category: "travel",
     price: 79,
     originalPrice: 99,
@@ -603,7 +619,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-glide-neck-pillow-speaker",
     slug: "glide-neck-pillow-speaker",
     title: "Glide Neck Pillow Speaker",
-    description: "Travel pillow with built-in low-profile speakers and washable cover.",
+    description:
+      "Travel pillow with built-in low-profile speakers and washable cover.",
     category: "travel",
     price: 99,
     originalPrice: 129,
@@ -620,7 +637,8 @@ const baseProducts: BaseProduct[] = [
     id: "prd-route-travel-bottle",
     slug: "route-travel-bottle",
     title: "Route Travel Bottle",
-    description: "Insulated bottle with magnetic lid dock and minimalist carry loop.",
+    description:
+      "Insulated bottle with magnetic lid dock and minimalist carry loop.",
     category: "travel",
     price: 49,
     originalPrice: 69,
@@ -635,8 +653,12 @@ const baseProducts: BaseProduct[] = [
   },
 ];
 
+const categoryMap: Record<string, Category> = Object.fromEntries(
+  categories.map((c) => [c.slug, c]),
+);
+
 function withComputedFields(product: BaseProduct): Product {
-  const category = categories.find((item) => item.slug === product.category);
+  const category = categoryMap[product.category];
 
   return {
     ...product,
@@ -668,7 +690,8 @@ function sortProducts(products: Product[], sort: SortOption) {
     case "newest":
       sorted.sort(
         (left, right) =>
-          new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+          new Date(right.createdAt).getTime() -
+          new Date(left.createdAt).getTime(),
       );
       break;
     case "featured":
@@ -693,7 +716,7 @@ export function getCategories() {
 }
 
 export function getCategoryBySlug(slug: string) {
-  return categories.find((category) => category.slug === slug);
+  return categoryMap[slug];
 }
 
 export function getHomeContent() {
@@ -794,13 +817,11 @@ export function getProductBySlug(slug: string) {
   return getAllProducts().find((product) => product.slug === slug);
 }
 
-export function getRelatedProducts(
-  product: Product,
-  limit = 4,
-) {
+export function getRelatedProducts(product: Product, limit = 4) {
   return sortProducts(
     getAllProducts().filter(
-      (item) => item.category === product.category && item.slug !== product.slug,
+      (item) =>
+        item.category === product.category && item.slug !== product.slug,
     ),
     "featured",
   ).slice(0, limit);
