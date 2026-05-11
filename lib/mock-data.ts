@@ -727,8 +727,13 @@ export function getHomeContent() {
   return homeContent;
 }
 
+let cachedAllProducts: Product[] | null = null;
+
 export function getAllProducts() {
-  return baseProducts.map(withComputedFields);
+  if (!cachedAllProducts) {
+    cachedAllProducts = baseProducts.map(withComputedFields);
+  }
+  return cachedAllProducts;
 }
 
 export function queryProducts({
