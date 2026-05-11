@@ -65,6 +65,72 @@ export function CartDrawer() {
     };
   }, [closeCart, isOpen]);
 
+  const getCartTitle = () => {
+    if (!hasHydrated) return "Loading cart";
+    if (itemCount === 1) return "1 item";
+    return `${itemCount} items`;
+  };
+
+  const renderContent = () => {
+    if (!hasHydrated) {
+      return <CartSkeleton />;
+    }
+
+    if (items.length === 0) {
+      return (
+        <EmptyState
+          title="Your cart is empty"
+          description="Add products from any category shelf and they will appear here instantly."
+          actionLabel="Shop all categories"
+          onAction={closeCart}
+        />
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {items.map((item) => (
+          <CartLineItem key={item.id} item={item} compact onNavigate={closeCart} />
+        ))}
+      </div>
+    );
+  };
+
+  const renderFooter = () => {
+    if (!hasHydrated || items.length === 0) {
+      return (
+        <Link
+          href="/category/all"
+          onClick={closeCart}
+          className="flex w-full items-center justify-center rounded-full bg-stone-950 px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-stone-800"
+        >
+          Explore products
+        </Link>
+      );
+    }
+
+    return (
+      <CartSummary
+        itemCount={itemCount}
+        subtotal={subtotal}
+        savings={savings}
+        showClear
+        onClear={clearCart}
+        primaryAction={{
+          href: "/checkout",
+          label: "Proceed to checkout",
+          onClick: closeCart,
+        }}
+        secondaryAction={{
+          href: "/cart",
+          label: "View full cart",
+          onClick: closeCart,
+        }}
+        note="Auralux uses a mock checkout flow here, but the cart totals and persisted line items are fully functional."
+      />
+    );
+  };
+
   return (
     <>
       <div
@@ -93,7 +159,7 @@ export function CartDrawer() {
               Shopping cart
             </p>
             <h2 id="cart-drawer-title" className="mt-1 text-2xl font-semibold tracking-tight text-stone-950">
-              {hasHydrated ? `${itemCount} ${itemCount === 1 ? "item" : "items"}` : "Loading cart"}
+              {getCartTitle()}
             </h2>
           </div>
           <button
@@ -107,53 +173,11 @@ export function CartDrawer() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
-          {!hasHydrated ? (
-            <CartSkeleton />
-          ) : items.length === 0 ? (
-            <EmptyState
-              title="Your cart is empty"
-              description="Add products from any category shelf and they will appear here instantly."
-              actionLabel="Shop all categories"
-              onAction={closeCart}
-            />
-          ) : (
-            <div className="space-y-4">
-              {items.map((item) => (
-                <CartLineItem key={item.id} item={item} compact onNavigate={closeCart} />
-              ))}
-            </div>
-          )}
+          {renderContent()}
         </div>
 
         <div className="border-t border-stone-200 px-5 py-5 sm:px-6">
-          {!hasHydrated || items.length === 0 ? (
-            <Link
-              href="/category/all"
-              onClick={closeCart}
-              className="flex w-full items-center justify-center rounded-full bg-stone-950 px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-stone-800"
-            >
-              Explore products
-            </Link>
-          ) : (
-            <CartSummary
-              itemCount={itemCount}
-              subtotal={subtotal}
-              savings={savings}
-              showClear
-              onClear={clearCart}
-              primaryAction={{
-                href: "/checkout",
-                label: "Proceed to checkout",
-                onClick: closeCart,
-              }}
-              secondaryAction={{
-                href: "/cart",
-                label: "View full cart",
-                onClick: closeCart,
-              }}
-              note="Auralux uses a mock checkout flow here, but the cart totals and persisted line items are fully functional."
-            />
-          )}
+          {renderFooter()}
         </div>
       </aside>
     </>
