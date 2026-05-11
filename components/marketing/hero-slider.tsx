@@ -10,6 +10,7 @@ import { useFirstVisitAutoplay } from "@/hooks/use-first-visit-autoplay";
 import type { HeroSlide } from "@/lib/types";
 
 const swipeThreshold = 48;
+const AUTOPLAY_INTERVAL_MS = 5200;
 
 function wrapIndex(index: number, total: number) {
   return (index + total) % total;
@@ -33,7 +34,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
       return;
     }
 
-    const interval = window.setInterval(() => advanceAutoplay(), 5200);
+    const interval = window.setInterval(() => advanceAutoplay(), AUTOPLAY_INTERVAL_MS);
 
     return () => window.clearInterval(interval);
   }, [autoplay, shouldReduceMotion, slides.length]);
