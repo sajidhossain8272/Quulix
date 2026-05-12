@@ -6,6 +6,8 @@ import { CartDrawer } from "@/components/cart/cart-drawer";
 import { Footer } from "@/components/layout/footer";
 import { CategoryBar } from "@/components/navigation/category-bar";
 import { Navbar } from "@/components/navigation/navbar";
+import { FacebookPixel } from "@/components/shared/FacebookPixel";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -57,6 +59,11 @@ export default function RootLayout({
             <CartDrawer />
           </div>
         </Providers>
+
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
+        <FacebookPixel />
       </body>
     </html>
   );
