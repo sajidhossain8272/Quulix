@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-import { getCategories } from "@/lib/mock-data";
-import type { CategoriesResponse } from "@/lib/types";
+export async function GET() {
+  const categories = await prisma.category.findMany({
+    orderBy: { createdAt: 'asc' }
+  });
 
-export function GET() {
-  const response: CategoriesResponse = {
-    data: getCategories(),
-  };
-
-  return NextResponse.json(response);
+  return NextResponse.json({
+    data: categories.map(cat => ({
+      id: cat.id,
+      slug: cat.slug,
+      name: cat.name,
+      description: cat.description || "",
+      tagline: cat.tagline || "",
+      image: cat.image || "",
+    }))
+  });
 }

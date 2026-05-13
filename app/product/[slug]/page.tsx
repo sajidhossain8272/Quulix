@@ -1,21 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 import { ProductCard } from "@/components/products/product-card";
 import { ProductPurchasePanel } from "@/components/products/product-purchase-panel";
 import { Container } from "@/components/shared/container";
 import { RatingStars } from "@/components/shared/rating-stars";
-import { getAllProducts, getCategoryBySlug, getProductBySlug, getRelatedProducts } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
+import type { Product } from "@/lib/types";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-function getSpotlight(productDate: string, rating: number, reviewCount: number) {
+function getSpotlight(productDate: string | Date, rating: number, reviewCount: number) {
   const createdAt = new Date(productDate);
   const daysSinceLaunch =
     (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
@@ -38,12 +40,16 @@ function getSpotlight(productDate: string, rating: number, reviewCount: number) 
 }
 
 export async function generateStaticParams() {
-  return getAllProducts().map((product) => ({ slug: product.slug }));
+  const products = await prisma.product.findMany({ select: { slug: true } });
+  return products.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await prisma.product.findUnique({
+    where: { slug },
+    include: { media: { where: { type: "IMAGE" }, take: 1 } },
+  });
 
   if (!product) {
     return {
@@ -51,27 +57,87 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     };
   }
 
+  const imageUrl = product.media[0]?.url || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80";
+
   return {
-    title: product.title,
-    description: product.description,
+    title: product.metaTitle || product.title,
+    description: product.metaDescription || product.description || undefined,
+    keywords: product.metaKeywords || undefined,
     openGraph: {
-      title: product.title,
-      description: product.description,
-      images: [{ url: product.image }],
+      title: product.metaTitle || product.title,
+      description: product.metaDescription || product.description || undefined,
+      images: [{ url: imageUrl }],
     },
   };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
 
-  if (!product) {
+  const productData = await prisma.product.findUnique({
+    where: { slug },
+    include: {
+      category: true,
+      media: { orderBy: { position: 'asc' } },
+      variants: true,
+    }
+  });
+
+  if (!productData) {
     notFound();
   }
 
-  const category = getCategoryBySlug(product.category);
-  const relatedProducts = getRelatedProducts(product, 4);
+  const relatedData = await prisma.product.findMany({
+    where: {
+      categoryId: productData.categoryId,
+      id: { not: productData.id }
+    },
+    take: 4,
+    include: {
+      category: true,
+      media: { where: { type: "IMAGE" }, take: 1 }
+    }
+  });
+
+  // Map to the frontend type expected by components
+  const product: any = {
+    id: productData.id,
+    slug: productData.slug,
+    title: productData.title,
+    description: productData.description,
+    category: productData.category.slug,
+    categoryName: productData.category.name,
+    price: productData.price,
+    originalPrice: productData.originalPrice || productData.price,
+    discountPercentage: productData.originalPrice ? Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100) : 0,
+    rating: productData.rating,
+    reviewCount: productData.reviewCount,
+    image: productData.media[0]?.url || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    tags: productData.tags,
+    inventory: productData.inventory,
+    featuredCollections: productData.featuredCollections as any,
+    createdAt: productData.createdAt.toISOString(),
+  };
+
+  const relatedProducts: any[] = relatedData.map(rp => ({
+    id: rp.id,
+    slug: rp.slug,
+    title: rp.title,
+    description: rp.description,
+    category: rp.category.slug,
+    categoryName: rp.category.name,
+    price: rp.price,
+    originalPrice: rp.originalPrice || rp.price,
+    discountPercentage: rp.originalPrice ? Math.round(((rp.originalPrice - rp.price) / rp.originalPrice) * 100) : 0,
+    rating: rp.rating,
+    reviewCount: rp.reviewCount,
+    image: rp.media[0]?.url || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    tags: rp.tags,
+    inventory: rp.inventory,
+    featuredCollections: rp.featuredCollections as any,
+    createdAt: rp.createdAt.toISOString(),
+  }));
+
   const spotlight = getSpotlight(
     product.createdAt,
     product.rating,
@@ -85,7 +151,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <Link href="/" className="transition hover:text-stone-950">Home</Link>
           <ChevronRight className="h-4 w-4" />
           <Link href={`/category/${product.category}`} className="transition hover:text-stone-950">
-            {category?.name ?? product.categoryName}
+            {product.categoryName}
           </Link>
           <ChevronRight className="h-4 w-4" />
           <span className="text-stone-900">{product.title}</span>
@@ -131,7 +197,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <div className="rounded-[24px] bg-stone-50 p-4">
                   <p className="text-sm font-medium text-stone-950">Designed for</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {product.tags.map((tag) => (
+                    {product.tags.map((tag: string) => (
                       <span
                         key={tag}
                         className="rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-medium text-stone-600"
@@ -158,7 +224,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {product.description}
               </p>
               <div className="mt-5 flex flex-wrap gap-3 text-sm text-stone-600">
-                {product.featuredCollections.map((collection) => (
+                {product.featuredCollections.map((collection: string) => (
                   <span
                     key={collection}
                     className="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 font-medium capitalize"
@@ -185,7 +251,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 You may also like
               </p>
               <h2 className="font-display text-3xl tracking-tight text-stone-950">
-                More from {category?.name ?? product.categoryName}
+                More from {product.categoryName}
               </h2>
             </div>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">

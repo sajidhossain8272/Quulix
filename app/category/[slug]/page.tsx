@@ -1,10 +1,10 @@
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 import { Container } from "@/components/shared/container";
 import { SectionSkeleton } from "@/components/ui/section-skeleton";
-import { getCategories, getCategoryBySlug } from "@/lib/mock-data";
 
 const CategoryPageClient = dynamic(
   () =>
@@ -27,9 +27,8 @@ type CategoryPageProps = {
 };
 
 export async function generateStaticParams() {
-  return ["all", ...getCategories().map((category) => category.slug)].map((slug) => ({
-    slug,
-  }));
+  const categories = await prisma.category.findMany({ select: { slug: true } });
+  return ["all", ...categories.map((c) => c.slug)].map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
@@ -37,12 +36,12 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   if (slug === "all") {
     return {
-      title: "All Categories",
-      description: "Browse the full Auralux Market catalog with filters, sorting, and pagination.",
+      title: "All Categories - KinooBD",
+      description: "Browse the full KinooBD catalog with filters, sorting, and pagination.",
     };
   }
 
-  const category = getCategoryBySlug(slug);
+  const category = await prisma.category.findUnique({ where: { slug } });
 
   if (!category) {
     return {
@@ -51,8 +50,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   }
 
   return {
-    title: category.name,
-    description: category.description,
+    title: category.metaTitle || category.name,
+    description: category.metaDescription || category.description || undefined,
+    keywords: category.metaKeywords || undefined,
+    openGraph: {
+      title: category.metaTitle || category.name,
+      description: category.metaDescription || category.description || undefined,
+      images: category.image ? [{ url: category.image }] : [],
+    },
   };
 }
 
@@ -63,8 +68,9 @@ export default async function CategoryPage({
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
 
-  if (slug !== "all" && !getCategoryBySlug(slug)) {
-    notFound();
+  if (slug !== "all") {
+    const category = await prisma.category.findUnique({ where: { slug } });
+    if (!category) notFound();
   }
 
   return <CategoryPageClient slug={slug} initialSearchParams={resolvedSearchParams} />;
