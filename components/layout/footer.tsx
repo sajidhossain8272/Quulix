@@ -15,8 +15,7 @@ export function Footer() {
       <Container className="flex flex-col gap-8 py-10 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
           <div>
-            <p className="font-display text-3xl tracking-tight text-stone-950">Auralux</p>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-stone-500">Market</p>
+            <img src="/logo.png" alt="QULLIX Logo" className="h-12 w-auto object-contain" />
           </div>
           <p className="max-w-md text-sm leading-6 text-stone-600">
             Mobile-first commerce for premium daily tech, shaped with calm surfaces,

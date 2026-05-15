@@ -59,7 +59,7 @@ export function CartPage() {
             Cart overview
           </p>
           <h1 className="mt-2 font-display text-4xl tracking-tight text-stone-950 sm:text-5xl">
-            Your Auralux cart
+            Your QULLIX cart
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-600 sm:text-base">
             Review line items, adjust quantities, and continue into the mock checkout flow.
