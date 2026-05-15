@@ -2,10 +2,6 @@ import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 
 import { Providers } from "@/app/providers";
-import { CartDrawer } from "@/components/cart/cart-drawer";
-import { Footer } from "@/components/layout/footer";
-import { CategoryBar } from "@/components/navigation/category-bar";
-import { Navbar } from "@/components/navigation/navbar";
 import { FacebookPixel } from "@/components/shared/FacebookPixel";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
@@ -50,15 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${fraunces.variable}`}>
       <body className="min-h-screen bg-background text-foreground antialiased">
-        <Providers>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <CategoryBar />
-            <div className="flex-1">{children}</div>
-            <Footer />
-            <CartDrawer />
-          </div>
-        </Providers>
+        <Providers>{children}</Providers>
 
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
