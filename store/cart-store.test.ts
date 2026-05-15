@@ -18,9 +18,13 @@ const mockProduct: Product = {
   category: "test",
   categoryName: "Test Category",
   rating: 4.5,
-  reviews: 10,
+  reviewCount: 10,
   description: "Test description",
-  features: ["Feature 1", "Feature 2"],
+  discountPercentage: 0,
+  tags: [],
+  inventory: 100,
+  featuredCollections: [],
+  createdAt: "2023-01-01T00:00:00.000Z",
 };
 
 const mockProduct2: Product = {
@@ -33,9 +37,13 @@ const mockProduct2: Product = {
   category: "test",
   categoryName: "Test Category",
   rating: 4.0,
-  reviews: 5,
+  reviewCount: 5,
   description: "Test description 2",
-  features: ["Feature 3"],
+  discountPercentage: 0,
+  tags: [],
+  inventory: 100,
+  featuredCollections: [],
+  createdAt: "2023-01-01T00:00:00.000Z",
 };
 
 describe("cart-store", () => {
