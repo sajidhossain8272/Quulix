@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 import { ProductCard } from "@/components/products/product-card";
+import { ProductGallery } from "@/components/products/product-gallery";
 import { ProductPurchasePanel } from "@/components/products/product-purchase-panel";
 import { Container } from "@/components/shared/container";
 import { RatingStars } from "@/components/shared/rating-stars";
@@ -164,29 +164,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-start">
           <section className="space-y-4">
-            <div className="relative overflow-hidden rounded-[36px] border border-stone-200 bg-white/90 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.9),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(216,224,230,0.5),transparent_30%)]" />
-              <div className="relative aspect-[4/4.4] sm:aspect-[4/4.1]">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 56vw"
-                  className="object-cover"
-                />
-              </div>
-              {product.discountPercentage > 0 ? (
-                <span className="absolute left-5 top-5 rounded-full bg-stone-950/90 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white">
-                  Save {product.discountPercentage}%
-                </span>
-              ) : null}
-              {spotlight ? (
-                <span className={`absolute right-5 top-5 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] ${spotlight.className}`}>
-                  {spotlight.label}
-                </span>
-              ) : null}
-            </div>
+            <ProductGallery
+              title={product.title}
+              media={productData.media.map((item) => ({
+                id: item.id,
+                type: item.type,
+                url: item.url,
+                alt: item.alt,
+              }))}
+              fallbackImage={product.image}
+              discountPercentage={product.discountPercentage}
+              spotlight={spotlight}
+            />
 
             <div className="rounded-[32px] border border-stone-200 bg-white/90 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">

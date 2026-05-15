@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# uploaded product media (keep folder via .gitkeep)
+/public/uploads/products/*
+!/public/uploads/products/.gitkeep
