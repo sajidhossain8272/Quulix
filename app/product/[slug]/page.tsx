@@ -40,8 +40,13 @@ function getSpotlight(productDate: string | Date, rating: number, reviewCount: n
 }
 
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({ select: { slug: true } });
-  return products.map((product) => ({ slug: product.slug }));
+  try {
+    const products = await prisma.product.findMany({ select: { slug: true } });
+    return products.map((product) => ({ slug: product.slug }));
+  } catch (error) {
+    console.error("Failed to fetch products for static generation:", error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {

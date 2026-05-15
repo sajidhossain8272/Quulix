@@ -27,8 +27,13 @@ type CategoryPageProps = {
 };
 
 export async function generateStaticParams() {
-  const categories = await prisma.category.findMany({ select: { slug: true } });
-  return ["all", ...categories.map((c) => c.slug)].map((slug) => ({ slug }));
+  try {
+    const categories = await prisma.category.findMany({ select: { slug: true } });
+    return ["all", ...categories.map((c) => c.slug)].map((slug) => ({ slug }));
+  } catch (error) {
+    console.error("Failed to fetch categories for static generation:", error);
+    return [{ slug: "all" }];
+  }
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
