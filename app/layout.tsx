@@ -21,22 +21,22 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://auralux-market.example.com"),
+  metadataBase: new URL("https://qullix.example.com"),
   title: {
-    default: "Auralux Market | Premium Everyday Tech",
-    template: "%s | Auralux Market",
+    default: "QULLIX | Premium Everyday Tech",
+    template: "%s | QULLIX",
   },
   description:
     "A production-ready mobile-first commerce frontend for premium daily tech, built with Next.js App Router, React Query, Zustand, and mock API routes.",
   openGraph: {
-    title: "Auralux Market",
+    title: "QULLIX",
     description:
       "Premium commerce UI with Apple-inspired surfaces and Amazon-style product discovery.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Auralux Market",
+    title: "QULLIX",
     description:
       "Mobile-first commerce UI built for scalable API-first product discovery.",
   },
