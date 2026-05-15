@@ -93,12 +93,12 @@ export function ProductCard({ product, priority }: ProductCardProps) {
           </span>
         ) : null}
       </div>
-      <div className="space-y-4 p-4 sm:p-5">
+      <div className="space-y-3 p-3 sm:space-y-4 sm:p-5">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
             {product.categoryName}
           </p>
-          <h3 className="min-h-[3.25rem] text-sm font-semibold leading-6 text-stone-950 sm:text-base">
+          <h3 className="min-h-[2.75rem] text-sm font-semibold leading-5 text-stone-950 sm:min-h-[3.25rem] sm:text-base sm:leading-6">
             <Link
               href={productHref}
               className="line-clamp-2 rounded-md transition hover:text-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-300"
@@ -108,25 +108,38 @@ export function ProductCard({ product, priority }: ProductCardProps) {
           </h3>
           <RatingStars rating={product.rating} reviewCount={product.reviewCount} />
         </div>
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-lg font-semibold tracking-tight text-stone-950 sm:text-xl">
+        <div className="flex items-end justify-between gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-base font-semibold tracking-tight text-stone-950 sm:text-lg md:text-xl">
               {formatCurrency(product.price)}
             </p>
-            <p className="text-xs text-stone-500 line-through">
+            <p className="text-[11px] text-stone-500 line-through sm:text-xs">
               {formatCurrency(product.originalPrice)}
             </p>
           </div>
           <Button
-            aria-label={`Add ${product.title} to cart`}
+            aria-label={
+              added
+                ? `${product.title} added to cart`
+                : `Add ${product.title} to cart`
+            }
             className={cn(
-              "min-w-[124px] gap-2 px-4",
+              "h-9 shrink-0 gap-1.5 px-2.5 py-0 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm md:min-w-[124px]",
               added && "bg-emerald-600 hover:bg-emerald-600",
             )}
             onClick={handleAddToCart}
           >
-            {added ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-            {added ? "Added" : "Add to cart"}
+            {added ? (
+              <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            ) : (
+              <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            )}
+            <span className="hidden min-[400px]:inline md:hidden">
+              {added ? "Added" : "Add"}
+            </span>
+            <span className="hidden md:inline">
+              {added ? "Added" : "Add to cart"}
+            </span>
           </Button>
         </div>
       </div>
