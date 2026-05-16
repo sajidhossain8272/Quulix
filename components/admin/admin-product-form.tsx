@@ -168,7 +168,7 @@ export function AdminProductForm({
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                Price ($)
+                Price (TK)
               </label>
               <input
                 name="price"
@@ -182,7 +182,7 @@ export function AdminProductForm({
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                Compare at price ($)
+                Compare at price (TK)
               </label>
               <input
                 name="originalPrice"

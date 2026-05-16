@@ -111,6 +111,18 @@ model ProductMedia {
   updatedAt DateTime @updatedAt
 }
 
+enum DeliveryZone {
+  INSIDE_DHAKA
+  OUTSIDE_DHAKA
+}
+
+model ShopSettings {
+  id                         String   @id @default("default")
+  deliveryChargeInsideDhaka  Float    @default(80)
+  deliveryChargeOutsideDhaka Float    @default(120)
+  updatedAt                  DateTime @updatedAt
+}
+
 model Order {
   id            String      @id @default(cuid())
 
@@ -120,6 +132,11 @@ model Order {
   address       String
   city          String?
   notes         String?
+
+  // Delivery
+  deliveryZone   DeliveryZone?
+  deliveryCharge Float         @default(0)
+  subtotal       Float?
 
   // Payment & Status
   totalAmount   Float

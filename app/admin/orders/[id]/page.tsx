@@ -6,6 +6,7 @@ import { OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/auth";
+import { formatCurrency } from "@/lib/utils";
 
 async function updateOrderStatus(formData: FormData) {
   "use server";
@@ -95,15 +96,36 @@ export default async function OrderDetailsPage(props: { params: Promise<{ id: st
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-900">${item.price.toFixed(2)}</p>
+                    <p className="font-medium text-gray-900">{formatCurrency(item.price)}</p>
                     <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-              <span className="font-medium text-gray-900">Total (COD)</span>
-              <span className="text-xl font-bold text-gray-900">${order.totalAmount.toFixed(2)}</span>
+            <div className="mt-6 space-y-2 border-t border-gray-100 pt-6 text-sm">
+              {order.subtotal != null ? (
+                <div className="flex items-center justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>{formatCurrency(order.subtotal)}</span>
+                </div>
+              ) : null}
+              {order.deliveryCharge > 0 ? (
+                <div className="flex items-center justify-between text-gray-600">
+                  <span>
+                    Delivery
+                    {order.deliveryZone === "INSIDE_DHAKA"
+                      ? " (Inside Dhaka)"
+                      : order.deliveryZone === "OUTSIDE_DHAKA"
+                        ? " (Outside Dhaka)"
+                        : ""}
+                  </span>
+                  <span>{formatCurrency(order.deliveryCharge)}</span>
+                </div>
+              ) : null}
+              <div className="flex items-center justify-between text-base font-semibold text-gray-900">
+                <span>Total (COD)</span>
+                <span className="text-xl font-bold">{formatCurrency(order.totalAmount)}</span>
+              </div>
             </div>
           </div>
         </div>

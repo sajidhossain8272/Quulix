@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { CheckCircle2, AlertCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { CartSummary } from "@/components/cart/cart-summary";
@@ -16,6 +16,14 @@ import {
   selectCartSubtotal,
   useCartStore,
 } from "@/store/cart-store";
+import { formatCurrency } from "@/lib/utils";
+
+type DeliveryZone = "INSIDE_DHAKA" | "OUTSIDE_DHAKA";
+
+type ShopSettings = {
+  deliveryChargeInsideDhaka: number;
+  deliveryChargeOutsideDhaka: number;
+};
 
 export function CheckoutPage() {
   const router = useRouter();
@@ -30,6 +38,8 @@ export function CheckoutPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shopSettings, setShopSettings] = useState<ShopSettings | null>(null);
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>("INSIDE_DHAKA");
 
   const [formData, setFormData] = useState({
     customerName: "",
@@ -43,7 +53,30 @@ export function CheckoutPage() {
     closeCart();
   }, [closeCart]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    fetch("/api/shop-settings")
+      .then((res) => res.json())
+      .then((data: ShopSettings) => setShopSettings(data))
+      .catch(() => {
+        setShopSettings({
+          deliveryChargeInsideDhaka: 80,
+          deliveryChargeOutsideDhaka: 120,
+        });
+      });
+  }, []);
+
+  const deliveryCharge = useMemo(() => {
+    if (!shopSettings) return 0;
+    return deliveryZone === "INSIDE_DHAKA"
+      ? shopSettings.deliveryChargeInsideDhaka
+      : shopSettings.deliveryChargeOutsideDhaka;
+  }, [deliveryZone, shopSettings]);
+
+  const total = subtotal + deliveryCharge;
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -55,8 +88,11 @@ export function CheckoutPage() {
     try {
       const payload = {
         ...formData,
-        totalAmount: subtotal, // In a real app, add shipping/taxes
-        items: items.map(item => ({
+        deliveryZone,
+        subtotal,
+        deliveryCharge,
+        totalAmount: total,
+        items: items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
           price: item.price,
@@ -110,7 +146,8 @@ export function CheckoutPage() {
               Thank you for your order!
             </h1>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-stone-600 sm:text-base">
-              We have received your Cash on Delivery order and will contact you shortly to confirm delivery.
+              We have received your Cash on Delivery order and will contact you
+              shortly to confirm delivery.
             </p>
             <Link
               href="/category/all"
@@ -152,21 +189,24 @@ export function CheckoutPage() {
             Complete your order
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-600 sm:text-base">
-            Please fill out your delivery details. You will pay in cash when the items are delivered to your door.
+            Please fill out your delivery details. You will pay in cash when the
+            items are delivered to your door.
           </p>
         </section>
       </Container>
 
       <Container className="pt-6">
-        <form onSubmit={handleCheckout} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <form
+          onSubmit={handleCheckout}
+          className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]"
+        >
           <div className="space-y-4">
-
-            {error && (
-              <div className="rounded-[24px] bg-red-50 p-4 border border-red-100 flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+            {error ? (
+              <div className="flex items-center gap-3 rounded-[24px] border border-red-100 bg-red-50 p-4">
+                <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
                 <p className="text-sm text-red-700">{error}</p>
               </div>
-            )}
+            ) : null}
 
             <section className="rounded-[32px] border border-stone-200 bg-white/95 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
@@ -174,18 +214,22 @@ export function CheckoutPage() {
               </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-stone-600 ml-2">Full Name *</label>
+                  <label className="ml-2 text-xs font-medium text-stone-600">
+                    Full Name *
+                  </label>
                   <input
                     name="customerName"
                     required
                     value={formData.customerName}
                     onChange={handleInputChange}
-                    placeholder="John Doe"
+                    placeholder="Your name"
                     className="h-12 w-full rounded-2xl border border-stone-200 bg-white px-4 text-sm outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-stone-600 ml-2">Phone Number *</label>
+                  <label className="ml-2 text-xs font-medium text-stone-600">
+                    Phone Number *
+                  </label>
                   <input
                     name="phone"
                     required
@@ -202,9 +246,63 @@ export function CheckoutPage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
                 Delivery Details
               </p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs font-medium text-stone-600 ml-2">Full Address *</label>
+              <div className="mt-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="ml-2 text-xs font-medium text-stone-600">
+                    Delivery area *
+                  </label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-stone-200 bg-white p-4 transition has-[:checked]:border-stone-900 has-[:checked]:ring-1 has-[:checked]:ring-stone-900">
+                      <input
+                        type="radio"
+                        name="deliveryZone"
+                        value="INSIDE_DHAKA"
+                        checked={deliveryZone === "INSIDE_DHAKA"}
+                        onChange={() => setDeliveryZone("INSIDE_DHAKA")}
+                        className="h-4 w-4 accent-stone-900"
+                      />
+                      <span>
+                        <span className="block text-sm font-medium text-stone-900">
+                          Inside Dhaka
+                        </span>
+                        <span className="text-xs text-stone-500">
+                          {shopSettings
+                            ? formatCurrency(shopSettings.deliveryChargeInsideDhaka)
+                            : "80 TK"}{" "}
+                          delivery
+                        </span>
+                      </span>
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-stone-200 bg-white p-4 transition has-[:checked]:border-stone-900 has-[:checked]:ring-1 has-[:checked]:ring-stone-900">
+                      <input
+                        type="radio"
+                        name="deliveryZone"
+                        value="OUTSIDE_DHAKA"
+                        checked={deliveryZone === "OUTSIDE_DHAKA"}
+                        onChange={() => setDeliveryZone("OUTSIDE_DHAKA")}
+                        className="h-4 w-4 accent-stone-900"
+                      />
+                      <span>
+                        <span className="block text-sm font-medium text-stone-900">
+                          Outside Dhaka
+                        </span>
+                        <span className="text-xs text-stone-500">
+                          {shopSettings
+                            ? formatCurrency(
+                                shopSettings.deliveryChargeOutsideDhaka,
+                              )
+                            : "120 TK"}{" "}
+                          delivery
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="ml-2 text-xs font-medium text-stone-600">
+                    Full Address *
+                  </label>
                   <input
                     name="address"
                     required
@@ -214,8 +312,10 @@ export function CheckoutPage() {
                     className="h-12 w-full rounded-2xl border border-stone-200 bg-white px-4 text-sm outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
                   />
                 </div>
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs font-medium text-stone-600 ml-2">City / District (Optional)</label>
+                <div className="space-y-1">
+                  <label className="ml-2 text-xs font-medium text-stone-600">
+                    City / District (optional)
+                  </label>
                   <input
                     name="city"
                     value={formData.city}
@@ -224,14 +324,16 @@ export function CheckoutPage() {
                     className="h-12 w-full rounded-2xl border border-stone-200 bg-white px-4 text-sm outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
                   />
                 </div>
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs font-medium text-stone-600 ml-2">Order Notes (Optional)</label>
+                <div className="space-y-1">
+                  <label className="ml-2 text-xs font-medium text-stone-600">
+                    Order Notes (optional)
+                  </label>
                   <textarea
                     name="notes"
                     value={formData.notes}
                     onChange={handleInputChange}
                     placeholder="Any special instructions for delivery?"
-                    className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 min-h-[100px]"
+                    className="min-h-[100px] w-full rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
                   />
                 </div>
               </div>
@@ -242,12 +344,13 @@ export function CheckoutPage() {
                 Payment Method
               </p>
               <div className="mt-4 rounded-[24px] border border-emerald-200 bg-emerald-50 p-4">
-                <p className="text-sm font-medium text-emerald-950 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
+                <p className="flex items-center gap-2 text-sm font-medium text-emerald-950">
+                  <CheckCircle2 className="h-4 w-4" />
                   Cash on Delivery (COD)
                 </p>
                 <p className="mt-1 text-sm leading-6 text-emerald-800">
-                  You will pay the delivery agent in cash when your order arrives. No digital payment required.
+                  You will pay the delivery agent in cash when your order
+                  arrives. No digital payment required.
                 </p>
               </div>
             </section>
@@ -258,16 +361,18 @@ export function CheckoutPage() {
               itemCount={itemCount}
               subtotal={subtotal}
               savings={savings}
+              deliveryCharge={deliveryCharge}
+              total={total}
               primaryAction={{ href: "/checkout", label: "Reviewing order" }}
               secondaryAction={{ href: "/cart", label: "Back to cart" }}
-              note="By placing this order, you agree to pay the total amount upon delivery."
+              note="Total includes delivery based on your selected area."
             />
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full h-12 text-base font-medium"
+              disabled={loading || !shopSettings}
+              className="h-12 w-full text-base font-medium"
             >
-              {loading ? "Processing..." : "Place Order (COD)"}
+              {loading ? "Processing..." : `Place Order (${formatCurrency(total)} COD)`}
             </Button>
           </div>
         </form>

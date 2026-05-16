@@ -6,6 +6,8 @@ type CartSummaryProps = {
   itemCount: number;
   subtotal: number;
   savings: number;
+  deliveryCharge?: number;
+  total?: number;
   className?: string;
   note?: string;
   showClear?: boolean;
@@ -26,13 +28,17 @@ export function CartSummary({
   itemCount,
   subtotal,
   savings,
+  deliveryCharge = 0,
+  total,
   className,
-  note = "Shipping and taxes are calculated during the mock checkout step.",
+  note = "Delivery charge is added at checkout based on your area.",
   showClear,
   onClear,
   primaryAction,
   secondaryAction,
 }: CartSummaryProps) {
+  const orderTotal = total ?? subtotal + deliveryCharge;
+
   return (
     <section
       className={cn(
@@ -65,13 +71,21 @@ export function CartSummary({
           <span>Subtotal</span>
           <span>{formatCurrency(subtotal)}</span>
         </div>
-        <div className="flex items-center justify-between text-stone-600">
-          <span>Savings</span>
-          <span className="text-emerald-600">-{formatCurrency(savings)}</span>
-        </div>
+        {savings > 0 ? (
+          <div className="flex items-center justify-between text-stone-600">
+            <span>Savings</span>
+            <span className="text-emerald-600">-{formatCurrency(savings)}</span>
+          </div>
+        ) : null}
+        {deliveryCharge > 0 ? (
+          <div className="flex items-center justify-between text-stone-600">
+            <span>Delivery</span>
+            <span>{formatCurrency(deliveryCharge)}</span>
+          </div>
+        ) : null}
         <div className="flex items-center justify-between text-base font-semibold text-stone-950">
           <span>Total</span>
-          <span>{formatCurrency(subtotal)}</span>
+          <span>{formatCurrency(orderTotal)}</span>
         </div>
       </div>
 

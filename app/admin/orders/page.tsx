@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { Eye, Clock, CheckCircle2, Truck, PackageCheck, XCircle } from "lucide-react";
 import { OrderStatus } from "@prisma/client";
@@ -69,7 +70,7 @@ export default async function OrdersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900">
-                      ${order.totalAmount.toFixed(2)}
+                      {formatCurrency(order.totalAmount)}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <Link

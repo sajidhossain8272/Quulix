@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { Plus, Edit, Trash2, Image as ImageIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
@@ -80,7 +81,7 @@ export default async function ProductsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">{product.category.name}</td>
-                  <td className="px-6 py-4">${product.price.toFixed(2)}</td>
+                  <td className="px-6 py-4">{formatCurrency(product.price)}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${product.inventory > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                       {product.inventory} in stock

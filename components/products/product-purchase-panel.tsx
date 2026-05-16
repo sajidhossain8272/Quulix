@@ -72,7 +72,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
       <div className="mt-5 grid gap-3 text-sm text-stone-600 sm:grid-cols-2">
         <div className="rounded-[22px] border border-stone-200 bg-white p-4">
           <p className="font-medium text-stone-950">Free premium shipping</p>
-          <p className="mt-1 leading-6">Complimentary delivery on orders above $150.</p>
+          <p className="mt-1 leading-6">Inside Dhaka from 80 TK, outside Dhaka from 120 TK per order.</p>
         </div>
         <div className="rounded-[22px] border border-stone-200 bg-white p-4">
           <p className="font-medium text-stone-950">Flexible returns</p>
