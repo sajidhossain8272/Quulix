@@ -17,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials.password as string;
 
         // Hardcoded admin for initial setup as requested by user
-        const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@kinoobd.com";
+        const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@quulix.com";
         const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
         if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {

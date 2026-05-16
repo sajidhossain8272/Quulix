@@ -126,7 +126,7 @@ export function CartDrawer() {
           label: "View full cart",
           onClick: closeCart,
         }}
-        note="QULLIX uses a mock checkout flow here, but the cart totals and persisted line items are fully functional."
+        note="Quulix uses a mock checkout flow here, but the cart totals and persisted line items are fully functional."
       />
     );
   };

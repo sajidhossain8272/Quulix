@@ -3,7 +3,7 @@
 import { Menu, Search, ShoppingBag, User, X, MapPin } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
@@ -20,6 +20,19 @@ export function Navbar() {
   const openCart = useCartStore((state) => state.openCart);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const previous = document.body.style.overflow;
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = previous || "";
+    }
+    return () => {
+      document.body.style.overflow = previous || "";
+    };
+  }, [mobileOpen]);
 
   const categories = data?.data ?? [];
 
@@ -49,7 +62,7 @@ export function Navbar() {
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="QULLIX Logo" className="h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="Quulix Logo" className="h-10 w-auto object-contain" />
           </Link>
           <div className="flex items-center gap-1">
             <Link
@@ -113,7 +126,7 @@ export function Navbar() {
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <Link href="/" className="min-w-[172px]">
-            <img src="/logo.png" alt="QULLIX Logo" className="h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="Quulix Logo" className="h-10 w-auto object-contain" />
           </Link>
           <form onSubmit={handleSubmit} className="relative flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
@@ -160,15 +173,57 @@ export function Navbar() {
         </div>
       </Container>
 
-      <div
-        className={cn(
-          "overflow-hidden border-t border-stone-200/80 bg-white transition-[max-height,opacity] duration-300",
-          mobileOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0",
-        )}
-      >
-        <Container className="py-5">
-          <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
-            <div className="space-y-2">
+      {/* Mobile slide-in panel (left) */}
+      <div aria-hidden={!mobileOpen} className={cn(mobileOpen ? "" : "pointer-events-none")}>
+        {/* Overlay */}
+        <div
+          onClick={() => setMobileOpen(false)}
+          className={cn(
+            "fixed inset-0 bg-black/40 z-40 transition-opacity duration-300",
+            mobileOpen ? "opacity-100" : "opacity-0",
+          )}
+        />
+
+        {/* Sliding panel */}
+        <aside
+          role="dialog"
+          aria-modal="true"
+          className={cn(
+            "fixed top-0 left-0 z-50 h-screen w-full sm:w-[420px] bg-white shadow-xl transition-transform duration-300 flex flex-col",
+            mobileOpen ? "translate-x-0" : "-translate-x-full",
+          )}
+        >
+          <Container className="pt-6 pb-4">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                <img src="/logo.png" alt="Quulix Logo" className="h-10 w-auto object-contain" />
+              </Link>
+              <Button
+                aria-label="Close navigation"
+                variant="ghost"
+                className="h-10 w-10 p-0"
+                onClick={() => setMobileOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="mt-4">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <input
+                  aria-label="Search products"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search premium audio, travel, wellness..."
+                  className="h-12 w-full rounded-full border border-stone-200 bg-white pl-11 pr-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-300"
+                />
+              </div>
+            </form>
+          </Container>
+
+          <div className="flex-1 overflow-auto px-6 pb-8 mobile-nav-scroll">
+            <div className="space-y-4">
               <Link
                 href="/category/all"
                 className={cn(
@@ -181,6 +236,7 @@ export function Navbar() {
               >
                 Shop all
               </Link>
+
               <a
                 href="#best-deals"
                 className="block rounded-2xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
@@ -188,6 +244,7 @@ export function Navbar() {
               >
                 Best deals
               </a>
+
               <a
                 href="#seasonal-deals"
                 className="block rounded-2xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
@@ -195,22 +252,23 @@ export function Navbar() {
               >
                 Seasonal deals
               </a>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/category/${category.slug}`}
-                  className="rounded-[24px] border border-stone-200 bg-stone-50 px-4 py-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(15,23,42,0.06)]"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <p className="text-sm font-semibold text-stone-950">{category.name}</p>
-                  <p className="mt-1 text-sm leading-6 text-stone-600">{category.tagline}</p>
-                </Link>
-              ))}
+
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/category/${category.slug}`}
+                    className="rounded-[24px] border border-stone-200 bg-stone-50 px-4 py-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(15,23,42,0.06)]"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <p className="text-sm font-semibold text-stone-950">{category.name}</p>
+                    <p className="mt-1 text-sm leading-6 text-stone-600">{category.tagline}</p>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
-        </Container>
+        </aside>
       </div>
     </header>
   );

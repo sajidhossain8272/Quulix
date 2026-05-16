@@ -5,7 +5,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 export const metadata = {
   title: {
     default: "Admin",
-    template: "%s | KinooBD Admin",
+    template: "%s | Quulix Admin",
   },
 };
 

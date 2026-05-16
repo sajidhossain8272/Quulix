@@ -39,10 +39,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
 
-  if (slug === "all") {
+    if (slug === "all") {
     return {
-      title: "All Categories - KinooBD",
-      description: "Browse the full KinooBD catalog with filters, sorting, and pagination.",
+      title: "All Categories - Quulix",
+      description: "Browse the full Quulix catalog with filters, sorting, and pagination.",
     };
   }
 

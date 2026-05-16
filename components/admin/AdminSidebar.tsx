@@ -43,8 +43,8 @@ export function AdminSidebar() {
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 lg:hidden">
-        <span className="text-sm font-bold tracking-tight text-gray-900">
-          KinooBD Admin
+          <span className="text-sm font-bold tracking-tight text-gray-900">
+          Quulix Admin
         </span>
         <button
           type="button"
@@ -73,7 +73,7 @@ export function AdminSidebar() {
       >
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
           <span className="text-lg font-bold tracking-tight text-gray-900">
-            KinooBD Admin
+            Quulix Admin
           </span>
           <button
             type="button"

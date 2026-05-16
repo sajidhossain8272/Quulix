@@ -1,6 +1,6 @@
-# KinooBD E-Commerce Production Readiness Plan
+# Quulix E-Commerce Production Readiness Plan
 
-This document outlines the complete strategy and steps taken to transform the KinooBD e-commerce application from a mock-data prototype into a fully functional, production-ready solution tailored for a Cash on Delivery (COD) business model.
+This document outlines the complete strategy and steps taken to transform the Quulix e-commerce application from a mock-data prototype into a fully functional, production-ready solution tailored for a Cash on Delivery (COD) business model.
 
 ## 1. Database & ORM Architecture (PostgreSQL + Prisma)
 Transitioning from `mock-data.ts` to a robust relational database.
@@ -14,7 +14,7 @@ Transitioning from `mock-data.ts` to a robust relational database.
 - **Orders & Order Items:** Capturing customer details through the COD form, total amounts, and specific variants ordered.
 
 ## 2. Authentication & Security
-- Implement secure login for the admin panel using `admin@kinoobd.com`.
+- Implement secure login for the admin panel using `admin@quulix.com`.
 - Hardcoded secure password (configurable via `.env` in production).
 - Middleware protection to ensure `/admin` routes are entirely inaccessible to the public.
 

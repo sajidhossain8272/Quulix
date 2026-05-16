@@ -96,7 +96,7 @@ export const useCartStore = create<CartState>()(
       setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {
-      name: "qullix-cart",
+      name: "quulix-cart",
       version: 2,
       partialize: (state) => ({
         items: state.items,

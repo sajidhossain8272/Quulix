@@ -344,7 +344,7 @@ export function CategoryPageClient({
     slug === "all" ? "All Categories" : (category?.name ?? "Catalog");
   const description =
     slug === "all"
-      ? "Browse the full QULLIX catalog with mobile-first filters and dense product discovery."
+      ? "Browse the full Quulix catalog with mobile-first filters and dense product discovery."
       : (category?.description ??
         "Refined products curated for premium everyday routines.");
 
