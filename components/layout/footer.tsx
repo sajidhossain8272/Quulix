@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/shared/container";
@@ -15,7 +16,7 @@ export function Footer() {
       <Container className="flex flex-col gap-8 py-10 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
           <div>
-            <img src="/logo.png" alt="Quulix Logo" className="h-12 w-auto object-contain" />
+            <Image src="/logo.png" alt="Quulix Logo" width={160} height={48} className="h-12 w-auto object-contain" />
           </div>
           <p className="max-w-md text-sm leading-6 text-stone-600">
             Mobile-first commerce for premium daily tech, shaped with calm surfaces,

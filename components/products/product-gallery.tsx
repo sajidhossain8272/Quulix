@@ -133,6 +133,9 @@ export function ProductGallery({
                   <img
                     src={thumb}
                     alt=""
+                    width={80}
+                    height={80}
+                    loading="lazy"
                     className="h-full w-full object-cover"
                   />
                 ) : (

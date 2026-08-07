@@ -87,7 +87,8 @@ export function HeroSlider({ slides }: HeroSliderProps) {
                 alt={activeSlide.alt}
                 fill
                 priority
-                sizes="100vw"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                quality={85}
                 className="object-cover opacity-65"
               />
               <div className="absolute inset-0 bg-gradient-to-br from-stone-950 via-stone-950/82 to-stone-900/55" />

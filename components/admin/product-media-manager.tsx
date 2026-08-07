@@ -142,6 +142,9 @@ export function ProductMediaManager({ initialMedia = [] }: ProductMediaManagerPr
                 <img
                   src={item.url}
                   alt={item.alt || "Product image"}
+                  width={200}
+                  height={200}
+                  loading="lazy"
                   className="aspect-square w-full object-cover"
                 />
                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/55 p-2 opacity-0 transition group-hover:opacity-100">

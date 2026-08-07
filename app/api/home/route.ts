@@ -40,7 +40,11 @@ export async function GET() {
       featuredCategorySlugs: categories.map((cat) => cat.slug),
     };
 
-    return NextResponse.json(homeContent);
+    return NextResponse.json(homeContent, {
+      headers: {
+        "Cache-Control": "public, max-age=60, s-maxage=600, stale-while-revalidate=86400",
+      },
+    });
   } catch (error) {
     return apiErrorResponse(error, "Failed to load home content.");
   }

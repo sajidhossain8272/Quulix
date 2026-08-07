@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu, Search, ShoppingBag, User, X, MapPin } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -62,7 +63,7 @@ export function Navbar() {
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Quulix Logo" className="h-10 w-auto object-contain" />
+            <Image src="/logo.png" alt="Quulix Logo" width={140} height={40} className="h-10 w-auto object-contain" priority />
           </Link>
           <div className="flex items-center gap-1">
             <Link
@@ -196,7 +197,7 @@ export function Navbar() {
           <Container className="pt-6 pb-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
-                <img src="/logo.png" alt="Quulix Logo" className="h-10 w-auto object-contain" />
+                <Image src="/logo.png" alt="Quulix Logo" width={140} height={40} className="h-10 w-auto object-contain" />
               </Link>
               <Button
                 aria-label="Close navigation"
