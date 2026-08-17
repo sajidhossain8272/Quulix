@@ -1,0 +1,24 @@
+# Quulix - Premium Everyday Tech & Acoustic Gear
+
+> Quulix is a direct-to-consumer e-commerce brand offering precision audio equipment, workspace tech accessories, and travel gear across Bangladesh.
+
+## Main Storefront Pages
+- [Home Page](https://quulix.vercel.app/): Featured audio gear, brand craft videos, top collections, and latest articles.
+- [All Products](https://quulix.vercel.app/category/all): Full product catalog with filters for price, category, rating, and discounts.
+- [Headphones](https://quulix.vercel.app/category/headphones): Premium active noise-canceling headphones, open-back monitors, and wireless earbuds.
+- [Speakers](https://quulix.vercel.app/category/speakers): High-fidelity bookshelf speakers and portable Bluetooth acoustics.
+- [Workspace Gear](https://quulix.vercel.app/category/workspace): Minimalist desk pads, aluminum headphone stands, and ergonomic studio tools.
+- [Travel Accessories](https://quulix.vercel.app/category/travel): Hard-shell travel cases, magnetic cables, and compact audio adapters.
+
+## Public JSON APIs for Agents
+- [GET /api/products](https://quulix.vercel.app/api/products): Search and filter products by category, price, discount, or keyword.
+- [GET /api/categories](https://quulix.vercel.app/api/categories): Retrieve list of all product categories and descriptions.
+- [GET /api/home](https://quulix.vercel.app/api/home): Retrieve hero banners, featured deal collections, and mosaic layouts.
+- [GET /api/shop-settings](https://quulix.vercel.app/api/shop-settings): Delivery charges (Inside Dhaka ৳80, Outside Dhaka ৳120) and hotline info.
+
+## Policies & Support
+- [About Quulix](https://quulix.vercel.app/about): Craftsmanship philosophy and acoustic engineering standards.
+- [Shipping & Returns](https://quulix.vercel.app/shipping): Cash on Delivery guidelines, nationwide delivery times, and 7-day exchange window.
+- [Terms & Conditions](https://quulix.vercel.app/terms): Store policies, 1-year official replacement warranty terms.
+- [Privacy Policy](https://quulix.vercel.app/privacy): Customer data privacy standards.
+- Hotline: +880 1755-377017 | Email: support@quulix.com

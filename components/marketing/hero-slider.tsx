@@ -111,9 +111,7 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
 
   return (
     <section
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="Featured collections hero slider"
+      aria-label="Featured collections carousel"
       className="relative isolate w-full overflow-hidden bg-stone-950 text-white aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[2.35/1] max-h-[720px] min-h-[300px] sm:min-h-[400px] md:min-h-[460px] lg:min-h-[520px]"
     >
       <AnimatePresence initial={false} custom={direction} mode="wait">

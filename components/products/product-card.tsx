@@ -109,13 +109,12 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
       <div className="relative aspect-square overflow-hidden bg-stone-100">
         <Link
           href={productHref}
-          tabIndex={-1}
-          aria-hidden="true"
+          aria-label={`View ${product.title}`}
           className="absolute inset-0 block"
         >
           <Image
             src={currentImage}
-            alt=""
+            alt={product.title}
             fill
             priority={priority}
             loading={priority ? "eager" : "lazy"}
