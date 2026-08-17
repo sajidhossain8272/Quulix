@@ -1,19 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Edit, Trash2 } from "lucide-react";
-import { revalidatePath } from "next/cache";
-
-import { auth } from "@/auth";
-
-async function deleteCategory(formData: FormData) {
-  "use server";
-  const session = await auth();
-  if (!session) throw new Error("Unauthorized");
-
-  const id = formData.get("id") as string;
-  await prisma.category.delete({ where: { id } });
-  revalidatePath("/admin/categories");
-}
+import { Plus, Edit } from "lucide-react";
 
 export default async function CategoriesPage() {
   const categories = await prisma.category.findMany({
@@ -68,12 +55,6 @@ export default async function CategoriesPage() {
                       >
                         <Edit className="w-4 h-4" />
                       </Link>
-                      <form action={deleteCategory}>
-                        <input type="hidden" name="id" value={category.id} />
-                        <button type="submit" className="text-gray-400 hover:text-red-600 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </form>
                     </div>
                   </td>
                 </tr>

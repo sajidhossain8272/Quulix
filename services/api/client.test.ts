@@ -28,7 +28,7 @@ test("apiClient - error with payload message", async (t) => {
     headers: { "Content-Type": "application/json" },
   });
 
-  const fetchMock = t.mock.method(global, "fetch", () =>
+  t.mock.method(global, "fetch", () =>
     Promise.resolve(mockResponse),
   );
 
@@ -48,7 +48,7 @@ test("apiClient - error with invalid JSON", async (t) => {
     headers: { "Content-Type": "application/json" },
   });
 
-  const fetchMock = t.mock.method(global, "fetch", () =>
+  t.mock.method(global, "fetch", () =>
     Promise.resolve(mockResponse),
   );
 
@@ -68,7 +68,7 @@ test("apiClient - error with empty payload", async (t) => {
     headers: { "Content-Type": "application/json" },
   });
 
-  const fetchMock = t.mock.method(global, "fetch", () =>
+  t.mock.method(global, "fetch", () =>
     Promise.resolve(mockResponse),
   );
 

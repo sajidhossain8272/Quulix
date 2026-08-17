@@ -1,13 +1,14 @@
 "use client";
 
-import { Menu, Search, ShoppingBag, User, X, MapPin } from "lucide-react";
+import { ChevronDown, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
+import { AnnouncementBar } from "@/components/navigation/announcement-bar";
 import { useCategories } from "@/hooks/use-categories";
 import { cn } from "@/lib/utils";
 import { selectCartCount, useCartStore } from "@/store/cart-store";
@@ -20,27 +21,29 @@ export function Navbar() {
   const isCartOpen = useCartStore((state) => state.isOpen);
   const openCart = useCartStore((state) => state.openCart);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const previous = document.body.style.overflow;
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = previous || "";
-    }
+    document.body.style.overflow = mobileOpen ? "hidden" : previous || "";
+
     return () => {
       document.body.style.overflow = previous || "";
     };
   }, [mobileOpen]);
 
   const categories = data?.data ?? [];
+  const midpoint = Math.ceil(categories.length / 2);
+  const leftCategories = categories.slice(0, midpoint);
+  const rightCategories = categories.slice(midpoint);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const query = search.trim();
     router.push(`/category/all${query ? `?search=${encodeURIComponent(query)}` : ""}`);
+    setSearchOpen(false);
     setMobileOpen(false);
   };
 
@@ -49,36 +52,82 @@ export function Navbar() {
     openCart();
   };
 
+  const categoryMenu = (category: (typeof categories)[number]) => (
+    <div key={category.id} className="relative" onMouseLeave={() => setOpenCategory(null)}>
+      <button
+        type="button"
+        aria-expanded={openCategory === category.id}
+        className={cn(
+          "flex h-10 items-center gap-1 whitespace-nowrap rounded-md px-2.5 text-xs font-bold uppercase tracking-[0.06em] text-stone-700 transition hover:bg-stone-100 hover:text-stone-950",
+          openCategory === category.id && "bg-stone-100 text-stone-950",
+        )}
+        onClick={() => setOpenCategory((current) => (current === category.id ? null : category.id))}
+        onMouseEnter={() => setOpenCategory(category.id)}
+      >
+        {category.name}
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
+      {openCategory === category.id ? (
+        <div className="absolute left-0 top-full z-50 w-64 pt-2">
+          <div className="rounded-xl border border-stone-200 bg-white p-2 shadow-[0_18px_50px_rgba(15,23,42,0.14)]">
+            <Link
+              href={`/category/${category.slug}`}
+              className="block rounded-lg px-3 py-2.5 transition hover:bg-stone-50"
+              onClick={() => setOpenCategory(null)}
+            >
+              <span className="block text-sm font-semibold text-stone-950">Shop {category.name}</span>
+              {category.tagline ? (
+                <span className="mt-0.5 block text-xs leading-5 text-stone-500">{category.tagline}</span>
+              ) : null}
+            </Link>
+            <Link
+              href={`/category/${category.slug}`}
+              className="block rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-stone-700 transition hover:bg-stone-50"
+              onClick={() => setOpenCategory(null)}
+            >
+              View collection
+            </Link>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/75 backdrop-blur-xl">
-      <Container className="py-3">
-        <div className="flex items-center justify-between gap-3 lg:hidden">
+    <>
+      <AnnouncementBar />
+      <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur-xl">
+      <Container>
+        <div className="flex h-[72px] items-center justify-between lg:hidden">
           <Button
             aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={mobileOpen}
             variant="ghost"
-            className="h-11 w-11 rounded-full p-0"
+            className="h-11 w-11 rounded-full border border-stone-200 p-0"
             onClick={() => setMobileOpen((value) => !value)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Quulix Logo" width={140} height={40} className="h-10 w-auto object-contain" priority />
+
+          <Link href="/" aria-label="Quulix home">
+            <Image src="/logo.png" alt="Quulix" width={140} height={40} className="object-contain" priority />
           </Link>
+
           <div className="flex items-center gap-1">
-            <Link
-              href="/category/all"
-              aria-label="Account"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
+            <Button
+              aria-label="Search products"
+              variant="ghost"
+              className="h-11 w-11 rounded-full border border-stone-200 p-0"
+              onClick={() => setMobileOpen(true)}
             >
-              <User className="h-5 w-5" />
-            </Link>
+              <Search className="h-5 w-5" />
+            </Button>
             <Button
               aria-label="Open cart"
               aria-controls="cart-drawer"
               aria-expanded={isCartOpen}
               variant="secondary"
-              className="relative h-11 w-11 rounded-full p-0 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
+              className="relative h-11 w-11 rounded-full p-0"
               onClick={handleCartOpen}
             >
               <ShoppingBag className="h-5 w-5" />
@@ -91,186 +140,156 @@ export function Navbar() {
           </div>
         </div>
 
-        <div className="mt-3 space-y-3 lg:hidden">
-          <form onSubmit={handleSubmit} className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
-            <input
+        <nav aria-label="Main navigation" className="relative hidden h-[76px] grid-cols-[minmax(0,1fr)_156px_minmax(0,1fr)] items-center lg:grid">
+          <div className="flex min-w-0 items-center justify-end gap-1">
+            <Button
               aria-label="Search products"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search premium audio, travel, wellness..."
-              className="h-12 w-full rounded-full border border-stone-200 bg-white pl-11 pr-4 text-sm text-stone-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] outline-none transition placeholder:text-stone-400 focus:border-stone-300"
-            />
-          </form>
-          <button
-            type="button"
-            className="flex w-full items-center gap-3 rounded-full border border-stone-200 bg-white px-4 py-3 text-left shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
-          >
-            <MapPin className="h-4 w-4 text-stone-500" />
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-stone-500">
-                Delivery
-              </p>
-              <p className="text-sm font-medium text-stone-900">Set your location</p>
-            </div>
-          </button>
-        </div>
+              aria-expanded={searchOpen}
+              variant="ghost"
+              className="h-10 w-10 shrink-0 rounded-full p-0 text-stone-900 hover:bg-stone-100"
+              onClick={() => {
+                setSearchOpen((value) => !value);
+                setOpenCategory(null);
+              }}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+            <div className="flex min-w-0 items-center overflow-visible">{leftCategories.map(categoryMenu)}</div>
+          </div>
 
-        <div className="hidden items-center gap-4 lg:flex">
-          <Button
-            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={mobileOpen}
-            variant="ghost"
-            className="h-12 w-12 rounded-full border border-stone-200 bg-white p-0 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
-            onClick={() => setMobileOpen((value) => !value)}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-          <Link href="/" className="min-w-[172px]">
-            <img src="/logo.png" alt="Quulix Logo" className="h-10 w-auto object-contain" />
+          <Link href="/" aria-label="Quulix home" className="relative z-10 mx-auto flex h-12 items-center justify-center px-3">
+            <Image src="/logo.png" alt="Quulix" width={150} height={43} className="object-contain" priority />
           </Link>
-          <form onSubmit={handleSubmit} className="relative flex-1">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
-            <input
-              aria-label="Search products"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search curated tech, audio, and seasonal essentials"
-              className="h-12 w-full rounded-full border border-stone-200 bg-white pl-11 pr-4 text-sm text-stone-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] outline-none transition placeholder:text-stone-400 focus:border-stone-300"
-            />
-          </form>
-          <button
-            type="button"
-            className="flex min-w-[188px] items-center gap-3 rounded-full border border-stone-200 bg-white px-4 py-3 text-left shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
-          >
-            <MapPin className="h-4 w-4 text-stone-500" />
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-stone-500">Delivery</p>
-              <p className="text-sm font-medium text-stone-900">Set your location</p>
-            </div>
-          </button>
-          <Link
-            href="/category/all"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
-            aria-label="Account"
-          >
-            <User className="h-5 w-5" />
-          </Link>
-          <Button
-            aria-label="Open cart"
-            aria-controls="cart-drawer"
-            aria-expanded={isCartOpen}
-            variant="secondary"
-            className="relative h-12 w-12 rounded-full p-0 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
-            onClick={handleCartOpen}
-          >
-            <ShoppingBag className="h-5 w-5" />
-            {cartCount > 0 ? (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-stone-950 px-1 text-[10px] font-semibold text-white">
-                {cartCount}
-              </span>
-            ) : null}
-          </Button>
-        </div>
+
+          <div className="flex min-w-0 items-center gap-1">
+            <div className="flex min-w-0 items-center overflow-visible">{rightCategories.map(categoryMenu)}</div>
+            <Link
+              href="/category/all"
+              className={cn(
+                "ml-1 whitespace-nowrap rounded-md px-2.5 py-2 text-xs font-bold uppercase tracking-[0.06em] transition hover:bg-stone-100",
+                pathname === "/category/all" ? "bg-stone-950 text-white hover:bg-stone-800" : "text-stone-700",
+              )}
+            >
+              Shop all
+            </Link>
+            <Link
+              href="/category/all"
+              aria-label="Account"
+              className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-stone-800 transition hover:bg-stone-100"
+            >
+              <User className="h-5 w-5" />
+            </Link>
+            <Button
+              aria-label="Open cart"
+              aria-controls="cart-drawer"
+              aria-expanded={isCartOpen}
+              variant="ghost"
+              className="relative h-10 w-10 shrink-0 rounded-full p-0 text-stone-900 hover:bg-stone-100"
+              onClick={handleCartOpen}
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {cartCount > 0 ? (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-stone-950 px-1 text-[10px] font-semibold text-white">
+                  {cartCount}
+                </span>
+              ) : null}
+            </Button>
+          </div>
+        </nav>
       </Container>
 
-      {/* Mobile slide-in panel (left) */}
-      <div aria-hidden={!mobileOpen} className={cn(mobileOpen ? "" : "pointer-events-none")}>
-        {/* Overlay */}
-        <div
-          onClick={() => setMobileOpen(false)}
-          className={cn(
-            "fixed inset-0 bg-black/40 z-40 transition-opacity duration-300",
-            mobileOpen ? "opacity-100" : "opacity-0",
-          )}
-        />
+      {searchOpen ? (
+        <div className="hidden border-t border-stone-100 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.08)] lg:block">
+          <Container className="py-3">
+            <form onSubmit={handleSubmit} className="relative mx-auto max-w-3xl">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+              <input
+                autoFocus
+                aria-label="Search products"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search products"
+                className="h-12 w-full rounded-full border border-stone-200 bg-stone-50 pl-11 pr-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
+              />
+            </form>
+          </Container>
+        </div>
+      ) : null}
 
-        {/* Sliding panel */}
+      <div aria-hidden={!mobileOpen} className={cn(mobileOpen ? "" : "pointer-events-none")}>
         <aside
           role="dialog"
           aria-modal="true"
           className={cn(
-            "fixed top-0 left-0 z-50 h-screen w-full sm:w-[420px] bg-white shadow-xl transition-transform duration-300 flex flex-col",
+            "fixed inset-0 z-[60] flex h-[100dvh] w-screen flex-col bg-white transition-transform duration-300 lg:hidden",
             mobileOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          <Container className="pt-6 pb-4">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
-                <Image src="/logo.png" alt="Quulix Logo" width={140} height={40} className="h-10 w-auto object-contain" />
-              </Link>
-              <Button
-                aria-label="Close navigation"
-                variant="ghost"
-                className="h-10 w-10 p-0"
-                onClick={() => setMobileOpen(false)}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+          <Container className="flex h-[72px] shrink-0 items-center justify-between border-b border-stone-200">
+            <Link href="/" aria-label="Quulix home" onClick={() => setMobileOpen(false)}>
+              <Image src="/logo.png" alt="Quulix" width={140} height={40} className="object-contain" priority />
+            </Link>
+            <Button
+              aria-label="Close navigation"
+              variant="ghost"
+              className="h-11 w-11 rounded-full border border-stone-200 p-0"
+              onClick={() => setMobileOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </Container>
 
-            <form onSubmit={handleSubmit} className="mt-4">
-              <div className="relative">
+          <div className="mobile-nav-scroll flex-1 overflow-y-auto">
+            <Container className="py-6">
+              <form onSubmit={handleSubmit} className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
                 <input
+                  autoFocus
                   aria-label="Search products"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search premium audio, travel, wellness..."
-                  className="h-12 w-full rounded-full border border-stone-200 bg-white pl-11 pr-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-300"
+                  placeholder="Search products"
+                  className="h-12 w-full rounded-full border border-stone-200 bg-stone-50 pl-11 pr-4 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:bg-white"
                 />
-              </div>
-            </form>
-          </Container>
+              </form>
 
-          <div className="flex-1 overflow-auto px-6 pb-8 mobile-nav-scroll">
-            <div className="space-y-4">
-              <Link
-                href="/category/all"
-                className={cn(
-                  "block rounded-2xl px-4 py-3 text-sm font-medium transition hover:bg-stone-100",
-                  pathname === "/category/all"
-                    ? "bg-stone-950 text-white hover:bg-stone-900"
-                    : "bg-stone-50 text-stone-900",
-                )}
-                onClick={() => setMobileOpen(false)}
-              >
-                Shop all
-              </Link>
-
-              <a
-                href="#best-deals"
-                className="block rounded-2xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
-                onClick={() => setMobileOpen(false)}
-              >
-                Best deals
-              </a>
-
-              <a
-                href="#seasonal-deals"
-                className="block rounded-2xl bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
-                onClick={() => setMobileOpen(false)}
-              >
-                Seasonal deals
-              </a>
-
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-8 space-y-1">
+                <Link
+                  href="/category/all"
+                  className="flex items-center justify-between rounded-xl bg-stone-950 px-4 py-4 text-sm font-semibold text-white"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Shop all
+                  <span aria-hidden="true">→</span>
+                </Link>
                 {categories.map((category) => (
                   <Link
                     key={category.id}
                     href={`/category/${category.slug}`}
-                    className="rounded-[24px] border border-stone-200 bg-stone-50 px-4 py-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(15,23,42,0.06)]"
+                    className="flex items-center justify-between border-b border-stone-100 px-4 py-4 text-base font-semibold text-stone-900 transition hover:bg-stone-50"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <p className="text-sm font-semibold text-stone-950">{category.name}</p>
-                    <p className="mt-1 text-sm leading-6 text-stone-600">{category.tagline}</p>
+                    {category.name}
+                    <ChevronDown className="-rotate-90 text-stone-400" />
                   </Link>
                 ))}
               </div>
-            </div>
+
+              <div className="mt-8 flex items-center gap-4 border-t border-stone-200 pt-6">
+                <Link href="/category/all" className="flex items-center gap-2 text-sm font-semibold text-stone-800" onClick={() => setMobileOpen(false)}>
+                  <User className="h-4 w-4" />
+                  Account
+                </Link>
+                <button type="button" className="flex items-center gap-2 text-sm font-semibold text-stone-800" onClick={handleCartOpen}>
+                  <ShoppingBag className="h-4 w-4" />
+                  Cart ({cartCount})
+                </button>
+              </div>
+            </Container>
           </div>
         </aside>
       </div>
     </header>
+    </>
   );
 }

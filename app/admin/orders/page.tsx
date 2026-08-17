@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { Eye, Clock, CheckCircle2, Truck, PackageCheck, XCircle } from "lucide-react";
-import { OrderStatus } from "@prisma/client";
 
 const statusConfig = {
   PENDING: { icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },

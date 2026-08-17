@@ -27,11 +27,32 @@ async function main() {
   }
 
   const categoryRows = await prisma.category.findMany({
-    select: { id: true, slug: true },
+    select: { id: true, slug: true, name: true, image: true },
   });
   const categoryIdBySlug = new Map(
     categoryRows.map((row) => [row.slug, row.id]),
   );
+
+  for (const [index, category] of categoryRows.slice(0, 3).entries()) {
+    if (!category.image) continue;
+
+    await prisma.heroBanner.upsert({
+      where: { id: `seed-hero-${category.id}` },
+      update: {
+        image: category.image,
+        alt: category.name,
+        sortOrder: index,
+        isActive: true,
+      },
+      create: {
+        id: `seed-hero-${category.id}`,
+        image: category.image,
+        alt: category.name,
+        sortOrder: index,
+        isActive: true,
+      },
+    });
+  }
 
   for (const product of getAllProducts()) {
     const categoryId = categoryIdBySlug.get(product.category);

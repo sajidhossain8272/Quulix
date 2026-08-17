@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeft, User, MapPin, Phone, StickyNote } from "lucide-react";
 import Link from "next/link";
 import { OrderStatus } from "@prisma/client";

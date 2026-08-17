@@ -11,11 +11,12 @@ import { ProductPurchasePanel } from "@/components/products/product-purchase-pan
 import { Container } from "@/components/shared/container";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { formatCurrency } from "@/lib/utils";
-import type { Product } from "@/lib/types";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 function getSpotlight(productDate: string | Date, rating: number, reviewCount: number) {
   const createdAt = new Date(productDate);

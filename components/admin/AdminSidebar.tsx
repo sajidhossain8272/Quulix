@@ -8,13 +8,14 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  PanelsTopLeft,
   Settings,
   ShoppingBag,
   ShoppingCart,
   Tags,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 const navigation = [
@@ -22,15 +23,20 @@ const navigation = [
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Products", href: "/admin/products", icon: ShoppingBag },
   { name: "Categories", href: "/admin/categories", icon: Tags },
+  { name: "Banners", href: "/admin/banners", icon: PanelsTopLeft },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const prevPathnameRef = useRef(pathname);
 
   useEffect(() => {
-    setIsOpen(false);
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
+      setIsOpen(false);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -43,7 +49,7 @@ export function AdminSidebar() {
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 lg:hidden">
-          <span className="text-sm font-bold tracking-tight text-gray-900">
+        <span className="text-sm font-bold tracking-tight text-gray-900">
           Quulix Admin
         </span>
         <button
@@ -59,7 +65,7 @@ export function AdminSidebar() {
       {isOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-gray-900/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
           aria-label="Close admin menu"
           onClick={() => setIsOpen(false)}
         />
@@ -94,6 +100,7 @@ export function AdminSidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => setIsOpen(false)}
                 className={clsx(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
@@ -113,21 +120,23 @@ export function AdminSidebar() {
           })}
         </nav>
 
-        <div className="space-y-1 border-t border-gray-200 p-4">
+        <div className="border-t border-gray-200 p-4 space-y-1">
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
           >
             <ExternalLink className="h-5 w-5 text-gray-400" />
-            View storefront
+            View Storefront
           </Link>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
           >
-            <LogOut className="h-5 w-5 text-red-500" />
-            Sign out
+            <LogOut className="h-5 w-5" />
+            Sign Out
           </button>
         </div>
       </aside>

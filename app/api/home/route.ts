@@ -4,27 +4,20 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
+    const [categories, banners] = await Promise.all([
+      prisma.category.findMany({
+      where: { isSystem: false },
       orderBy: { createdAt: "asc" },
       take: 6,
-    });
-
-    const heroSlides = categories.slice(0, 3).map((cat, index) => ({
-      id: `hero-${cat.id}`,
-      eyebrow: index === 0 ? "Featured" : "New Arrival",
-      title: cat.tagline || `Explore our ${cat.name} collection`,
-      description:
-        cat.description || `Discover the best in ${cat.name}.`,
-      ctaLabel: `Shop ${cat.name}`,
-      ctaHref: `/category/${cat.slug}`,
-      image:
-        cat.image ||
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
-      alt: cat.name,
-    }));
+      }),
+      prisma.heroBanner.findMany({
+        where: { isActive: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      }),
+    ]);
 
     const homeContent = {
-      heroSlides,
+      heroSlides: banners,
       sections: {
         bestDeals: {
           title: "Best Deals & Discounts",

@@ -30,6 +30,7 @@ export type Product = {
   rating: number;
   reviewCount: number;
   image: string;
+  images?: string[];
   tags: string[];
   inventory: number;
   featuredCollections: ProductCollection[];
@@ -38,13 +39,13 @@ export type Product = {
 
 export type HeroSlide = {
   id: string;
-  eyebrow: string;
-  title: string;
-  description: string;
-  ctaLabel: string;
-  ctaHref: string;
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
   image: string;
-  alt: string;
+  alt?: string | null;
 };
 
 export type HomeSectionSummary = {

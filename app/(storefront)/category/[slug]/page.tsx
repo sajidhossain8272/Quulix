@@ -1,4 +1,4 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/shared/container";
 import { SectionSkeleton } from "@/components/ui/section-skeleton";
 
-const CategoryPageClient = dynamic(
+const CategoryPageClient = nextDynamic(
   () =>
     import("@/features/category/category-page-client").then(
       (module) => module.CategoryPageClient,
@@ -25,6 +25,8 @@ type CategoryPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   try {
