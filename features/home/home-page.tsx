@@ -14,18 +14,24 @@ import { SectionSkeleton } from "@/components/ui/section-skeleton";
 import { useCategories } from "@/hooks/use-categories";
 import { useHomeData } from "@/hooks/use-home-data";
 import { DEFAULT_STORE_SETTINGS, type StoreSettings } from "@/lib/shop-settings";
-import type { Category, HomeResponse } from "@/lib/types";
+import type { Category, HomeResponse, Product } from "@/lib/types";
 
 type HomePageProps = {
   initialHomeData?: HomeResponse;
   initialCategories?: Category[];
   initialSettings?: StoreSettings;
+  initialBestDeals?: Product[];
+  initialSeasonalDeals?: Product[];
+  initialCategoryProductsMap?: Record<string, Product[]>;
 };
 
 export function HomePage({
   initialHomeData,
   initialCategories,
   initialSettings,
+  initialBestDeals,
+  initialSeasonalDeals,
+  initialCategoryProductsMap,
 }: HomePageProps) {
   const homeQuery = useHomeData(initialHomeData ? { initialData: initialHomeData } : undefined);
   const categoriesQuery = useCategories(initialCategories ? { initialData: { data: initialCategories } } : undefined);
@@ -90,23 +96,25 @@ export function HomePage({
         <CategoryMosaic categories={currentCategories} />
       ) : null}
 
-      {/* 3. Featured Deals Sections */}
+      {/* 3. Featured Deals Sections (SSR pre-rendered) */}
       <Container className="space-y-12 pt-8 sm:space-y-16 sm:pt-10">
         <DealsSection
           id="best-deals"
           title={activeHomeData.sections.bestDeals.title}
           description={activeHomeData.sections.bestDeals.description}
           collection={activeHomeData.sections.bestDeals.collection}
+          initialProducts={initialBestDeals}
         />
         <DealsSection
           id="seasonal-deals"
           title={activeHomeData.sections.seasonal.title}
           description={activeHomeData.sections.seasonal.description}
           collection={activeHomeData.sections.seasonal.collection}
+          initialProducts={initialSeasonalDeals}
         />
       </Container>
 
-      {/* 4. Curated Category Shelves */}
+      {/* 4. Curated Category Shelves (SSR pre-rendered) */}
       <Container className="space-y-12 pt-12 sm:space-y-16 sm:pt-16">
         {categoriesQuery.isLoading && currentCategories.length === 0 ? (
           <>
@@ -115,7 +123,11 @@ export function HomePage({
           </>
         ) : (
           orderedCategories.slice(0, 2).map((category) => (
-            <CategorySection key={category.id} category={category} />
+            <CategorySection
+              key={category.id}
+              category={category}
+              initialProducts={initialCategoryProductsMap?.[category.slug]}
+            />
           ))
         )}
       </Container>

@@ -1,14 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_STORE_SETTINGS, getShopSettings, type StoreSettings } from "@/lib/shop-settings";
-import type { Category, HomeResponse } from "@/lib/types";
+import type { Category, HomeResponse, Product } from "@/lib/types";
+
+function formatProduct(p: any): Product {
+  return {
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    category: p.category.slug,
+    categoryName: p.category.name,
+    price: p.price,
+    originalPrice: p.originalPrice || p.price,
+    discountPercentage: p.originalPrice
+      ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)
+      : 0,
+    rating: p.rating,
+    reviewCount: p.reviewCount,
+    image:
+      p.media[0]?.url ||
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    images: p.media.map((m: any) => m.url),
+    tags: p.tags,
+    inventory: p.inventory,
+    featuredCollections: p.featuredCollections as any,
+    createdAt: p.createdAt.toISOString(),
+  };
+}
 
 export async function getHomePageData(): Promise<{
   homeData: HomeResponse;
   categories: Category[];
   settings: StoreSettings;
+  bestDealsProducts: Product[];
+  seasonalDealsProducts: Product[];
+  categoryProductsMap: Record<string, Product[]>;
 }> {
   try {
-    const [categories, banners, settings] = await Promise.all([
+    const [categories, banners, settings, bestDealsRaw, seasonalRaw] = await Promise.all([
       prisma.category.findMany({
         where: { isSystem: false },
         orderBy: { createdAt: "asc" },
@@ -19,6 +49,24 @@ export async function getHomePageData(): Promise<{
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       }),
       getShopSettings(),
+      prisma.product.findMany({
+        where: { featuredCollections: { has: "best-deals" } },
+        orderBy: { rating: "desc" },
+        take: 4,
+        include: {
+          category: true,
+          media: { where: { type: "IMAGE" }, orderBy: { position: "asc" } },
+        },
+      }),
+      prisma.product.findMany({
+        where: { featuredCollections: { has: "seasonal" } },
+        orderBy: { rating: "desc" },
+        take: 4,
+        include: {
+          category: true,
+          media: { where: { type: "IMAGE" }, orderBy: { position: "asc" } },
+        },
+      }),
     ]);
 
     const formattedCategories: Category[] = categories.map((c) => ({
@@ -32,6 +80,26 @@ export async function getHomePageData(): Promise<{
       productCount: 0,
       createdAt: c.createdAt.toISOString(),
     }));
+
+    const topCategorySlugs = categories.slice(0, 2).map((c) => c.slug);
+    const categoryProductsRaw = await Promise.all(
+      topCategorySlugs.map((slug) =>
+        prisma.product.findMany({
+          where: { category: { slug } },
+          orderBy: { rating: "desc" },
+          take: 4,
+          include: {
+            category: true,
+            media: { where: { type: "IMAGE" }, orderBy: { position: "asc" } },
+          },
+        }),
+      ),
+    );
+
+    const categoryProductsMap: Record<string, Product[]> = {};
+    topCategorySlugs.forEach((slug, index) => {
+      categoryProductsMap[slug] = categoryProductsRaw[index].map(formatProduct);
+    });
 
     const homeData: HomeResponse = {
       heroSlides: banners.map((b) => ({
@@ -63,6 +131,9 @@ export async function getHomePageData(): Promise<{
       homeData,
       categories: formattedCategories,
       settings: settings || DEFAULT_STORE_SETTINGS,
+      bestDealsProducts: bestDealsRaw.map(formatProduct),
+      seasonalDealsProducts: seasonalRaw.map(formatProduct),
+      categoryProductsMap,
     };
   } catch (error) {
     console.error("Error fetching homepage SSR data:", error);
@@ -85,6 +156,9 @@ export async function getHomePageData(): Promise<{
       },
       categories: [],
       settings: DEFAULT_STORE_SETTINGS,
+      bestDealsProducts: [],
+      seasonalDealsProducts: [],
+      categoryProductsMap: {},
     };
   }
 }

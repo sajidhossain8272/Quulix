@@ -9,32 +9,50 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { SectionSkeleton } from "@/components/ui/section-skeleton";
 import { useProducts } from "@/hooks/use-products";
-import type { Category } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type CategorySectionProps = {
   category: Category;
+  initialProducts?: Product[];
 };
 
-export function CategorySection({ category }: CategorySectionProps) {
-  const query = useProducts({
-    category: category.slug,
-    limit: 8,
-    sort: "featured",
-  });
+export function CategorySection({ category, initialProducts }: CategorySectionProps) {
+  const query = useProducts(
+    {
+      category: category.slug,
+      limit: 8,
+      sort: "featured",
+    },
+    initialProducts
+      ? {
+          initialData: {
+            data: initialProducts,
+            pagination: {
+              page: 1,
+              limit: 8,
+              total: initialProducts.length,
+              totalPages: 1,
+              hasMore: false,
+            },
+            meta: {
+              availablePriceRange: { min: 0, max: 0 },
+            },
+          },
+        }
+      : undefined,
+  );
 
-  const products = query.data?.data || [];
+  const products = query.data?.data || initialProducts || [];
   const [activeIndex, setActiveIndex] = useState(0);
   const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
   const [isControlsHovered, setIsControlsHovered] = useState(false);
 
-  // Items per page chunk
   const itemsPerPage = 4;
   const maxSlides = Math.max(1, Math.ceil(products.length / itemsPerPage));
 
   const isPaused = Boolean(hoveredProductId || isControlsHovered);
 
-  // Auto scroll category products interval with safe wrap-around
   useEffect(() => {
     if (isPaused || maxSlides <= 1) {
       return;
@@ -55,11 +73,11 @@ export function CategorySection({ category }: CategorySectionProps) {
     setActiveIndex((prev) => (prev + 1) % maxSlides);
   }, [maxSlides]);
 
-  if (query.isLoading) {
+  if (query.isLoading && !products.length) {
     return <SectionSkeleton cards={4} />;
   }
 
-  if (query.isError) {
+  if (query.isError && !products.length) {
     return <ErrorState onRetry={() => query.refetch()} />;
   }
 
@@ -81,13 +99,11 @@ export function CategorySection({ category }: CategorySectionProps) {
         ctaLabel="See all"
       />
 
-      {/* Category Auto-Scroll Carousel Container */}
       <div
         className="relative group/carousel px-1"
         onMouseEnter={() => setIsControlsHovered(true)}
         onMouseLeave={() => setIsControlsHovered(false)}
       >
-        {/* Navigation Arrow Left */}
         {maxSlides > 1 ? (
           <button
             type="button"
@@ -99,7 +115,6 @@ export function CategorySection({ category }: CategorySectionProps) {
           </button>
         ) : null}
 
-        {/* Carousel Slide Track */}
         <div className="overflow-hidden rounded-[24px]">
           <div
             className="flex transition-transform duration-700 ease-in-out"
@@ -137,7 +152,6 @@ export function CategorySection({ category }: CategorySectionProps) {
           </div>
         </div>
 
-        {/* Navigation Arrow Right */}
         {maxSlides > 1 ? (
           <button
             type="button"
@@ -149,7 +163,6 @@ export function CategorySection({ category }: CategorySectionProps) {
           </button>
         ) : null}
 
-        {/* Pagination Dots (Matching Reference Screenshot 1) */}
         {maxSlides > 1 ? (
           <div className="mt-5 flex items-center justify-center gap-2">
             {Array.from({ length: maxSlides }).map((_, dotIdx) => (
@@ -159,10 +172,10 @@ export function CategorySection({ category }: CategorySectionProps) {
                 onClick={() => setActiveIndex(dotIdx)}
                 aria-label={`Go to slide ${dotIdx + 1}`}
                 className={cn(
-                  "h-2.5 rounded-full transition-all duration-300",
+                  "h-2.5 rounded-full transition-opacity duration-200",
                   dotIdx === activeIndex
-                    ? "w-7 bg-stone-900"
-                    : "w-2.5 bg-stone-300 hover:bg-stone-400",
+                    ? "w-7 bg-stone-900 opacity-100"
+                    : "w-2.5 bg-stone-300 opacity-70 hover:opacity-100",
                 )}
               />
             ))}
@@ -172,4 +185,3 @@ export function CategorySection({ category }: CategorySectionProps) {
     </section>
   );
 }
-
