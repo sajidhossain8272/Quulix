@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const categorySlug = searchParams.get("category");
     const collection = searchParams.get("collection");
     const page = parseNumber(searchParams.get("page")) || 1;
-    const limit = parseNumber(searchParams.get("limit")) || 8;
+    const limit = Math.min(100, parseNumber(searchParams.get("limit")) || 16);
     const sort = (searchParams.get("sort") as SortOption) || "featured";
     const minPrice = parseNumber(searchParams.get("minPrice"));
     const maxPrice = parseNumber(searchParams.get("maxPrice"));

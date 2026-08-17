@@ -113,6 +113,9 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
             alt={`${product.title} view ${activeImageIndex + 1}`}
             fill
             priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+            quality={80}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-all duration-500 ease-out group-hover:scale-[1.04]"
           />

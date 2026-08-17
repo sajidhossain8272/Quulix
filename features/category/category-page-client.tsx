@@ -1,19 +1,26 @@
 "use client";
 
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Loader2, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDeferredValue, useEffect, useState, useTransition } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 
 import { ProductCard } from "@/components/products/product-card";
 import { Container } from "@/components/shared/container";
-import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
 import { Pagination } from "@/components/ui/pagination";
 import { SectionSkeleton } from "@/components/ui/section-skeleton";
 import { Button } from "@/components/ui/button";
 import { useCategories } from "@/hooks/use-categories";
 import { useProducts } from "@/hooks/use-products";
-import type { SortOption } from "@/lib/types";
+import type { Product, SortOption } from "@/lib/types";
 import { buildSearchParams, cn } from "@/lib/utils";
 
 type SearchParamRecord = Record<string, string | string[] | undefined>;
@@ -49,17 +56,17 @@ const SORT_OPTIONS: { label: string; value: SortOption }[] = [
   { label: "Biggest discount", value: "discount-desc" },
 ];
 
+const DESKTOP_PAGE_SIZE = 16;
+const MOBILE_BATCH_SIZE = 16;
+const MOBILE_MAX_AUTO_SCROLL_PRODUCTS = 48; // Checkpoint after ~50 items to keep mobile memory ultra-fast
+
 function readValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
 function readNumber(value: string | string[] | undefined) {
   const resolved = readValue(value);
-
-  if (!resolved) {
-    return undefined;
-  }
-
+  if (!resolved) return undefined;
   const number = Number(resolved);
   return Number.isFinite(number) ? number : undefined;
 }
@@ -289,15 +296,21 @@ export function CategoryPageClient({
   );
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  // Mobile Infinite Scroll Accumulated State
+  const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
   const deferredSearch = useDeferredValue(search.trim());
 
+  // Products Query with desktop size 16
   const productsQuery = useProducts(
     {
       category: slug,
       search: deferredSearch || undefined,
       sort,
       page,
-      limit: 4,
+      limit: DESKTOP_PAGE_SIZE,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       minRating: minRating ? Number(minRating) : undefined,
@@ -306,6 +319,14 @@ export function CategoryPageClient({
     { preserveData: true },
   );
 
+  // Reset accumulated products when search, filters, or category changes
+  useEffect(() => {
+    if (page === 1 && productsQuery.data?.data) {
+      setAccumulatedProducts(productsQuery.data.data);
+    }
+  }, [page, productsQuery.data?.data]);
+
+  // Sync URL search params
   useEffect(() => {
     const queryString = buildSearchParams({
       search: deferredSearch || undefined,
@@ -337,6 +358,88 @@ export function CategoryPageClient({
     sort,
   ]);
 
+  // Mobile Infinite Scroll Fetch Next Page Handler
+  const handleLoadMoreMobile = useCallback(async () => {
+    if (
+      isLoadingMore ||
+      !productsQuery.data?.pagination.hasMore ||
+      accumulatedProducts.length >= MOBILE_MAX_AUTO_SCROLL_PRODUCTS
+    ) {
+      return;
+    }
+
+    try {
+      setIsLoadingMore(true);
+      const nextPage = page + 1;
+      const query = buildSearchParams({
+        category: slug,
+        search: deferredSearch || undefined,
+        sort,
+        page: nextPage,
+        limit: MOBILE_BATCH_SIZE,
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
+        minRating: minRating ? Number(minRating) : undefined,
+        discountOnly: discountOnly ? "true" : undefined,
+      });
+
+      const res = await fetch(`/api/products?${query}`);
+      const json = await res.json();
+      if (json.data && json.data.length > 0) {
+        setAccumulatedProducts((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newItems = json.data.filter(
+            (p: Product) => !existingIds.has(p.id),
+          );
+          return [...prev, ...newItems];
+        });
+        setPage(nextPage);
+      }
+    } catch {
+      // Ignore network errors gracefully
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [
+    accumulatedProducts.length,
+    deferredSearch,
+    discountOnly,
+    isLoadingMore,
+    maxPrice,
+    minPrice,
+    minRating,
+    page,
+    productsQuery.data?.pagination.hasMore,
+    slug,
+    sort,
+  ]);
+
+  // IntersectionObserver for seamless Mobile Infinite Scroll
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          productsQuery.data?.pagination.hasMore &&
+          accumulatedProducts.length < MOBILE_MAX_AUTO_SCROLL_PRODUCTS
+        ) {
+          handleLoadMoreMobile();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [
+    accumulatedProducts.length,
+    handleLoadMoreMobile,
+    productsQuery.data?.pagination.hasMore,
+  ]);
+
   const category = categoriesQuery.data?.data.find(
     (item) => item.slug === slug,
   );
@@ -344,7 +447,7 @@ export function CategoryPageClient({
     slug === "all" ? "All Categories" : (category?.name ?? "Catalog");
   const description =
     slug === "all"
-      ? "Browse the full Quulix catalog with mobile-first filters and dense product discovery."
+      ? "Browse the full Quulix catalog with fast filters, 16 products per page, and mobile infinite scroll."
       : (category?.description ??
         "Refined products curated for premium everyday routines.");
 
@@ -356,32 +459,38 @@ export function CategoryPageClient({
     setMaxPrice("");
     setMinRating("");
     setDiscountOnly(false);
+    setAccumulatedProducts([]);
   };
+
+  const currentProducts =
+    accumulatedProducts.length > 0
+      ? accumulatedProducts
+      : productsQuery.data?.data || [];
 
   return (
     <main className="pb-16 sm:pb-20">
       <Container className="pt-6 sm:pt-8">
-        <section className="overflow-hidden rounded-[32px] border border-stone-200 bg-white/85 p-6 shadow-[0_22px_70px_rgba(15,23,42,0.06)] sm:p-8 lg:p-10">
+        <section className="overflow-hidden rounded-[28px] sm:rounded-[32px] border border-stone-200 bg-white/85 p-6 shadow-[0_22px_70px_rgba(15,23,42,0.06)] sm:p-8 lg:p-10">
           <div className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-stone-500">
-              Dynamic category page
+              Quulix Collection
             </p>
-            <div className="space-y-3">
-              <h1 className="font-display text-4xl tracking-tight text-stone-950 sm:text-5xl">
+            <div className="space-y-2.5">
+              <h1 className="font-display text-3xl tracking-tight text-stone-950 sm:text-4xl lg:text-5xl">
                 {title}
               </h1>
-              <p className="max-w-2xl text-sm leading-7 text-stone-600 sm:text-base">
+              <p className="max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600 sm:text-base">
                 {description}
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-stone-500">
-              <span className="rounded-full bg-stone-100 px-4 py-2">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-stone-500 pt-1">
+              <span className="rounded-full bg-stone-100 px-3.5 py-1.5 font-medium text-stone-700">
                 {productsQuery.data?.pagination.total ?? 0} products
               </span>
-              <span className="rounded-full bg-stone-100 px-4 py-2">
+              <span className="rounded-full bg-stone-100 px-3.5 py-1.5 text-stone-600">
                 {productsQuery.isFetching
-                  ? "Refreshing catalog"
-                  : "Cached via React Query"}
+                  ? "Refreshing catalog..."
+                  : "Showing up to 16 per page"}
               </span>
             </div>
           </div>
@@ -390,8 +499,9 @@ export function CategoryPageClient({
 
       <Container className="pt-6">
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+          {/* Desktop Filter Sidebar */}
           <aside className="hidden lg:block">
-            <div className="rounded-[28px] border border-stone-200 bg-white/90 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+            <div className="sticky top-28 rounded-[28px] border border-stone-200 bg-white/90 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
               <FiltersPanel
                 search={search}
                 minPrice={minPrice}
@@ -403,30 +513,37 @@ export function CategoryPageClient({
                 onSearchChange={(value) => {
                   setSearch(value);
                   setPage(1);
+                  setAccumulatedProducts([]);
                 }}
                 onMinPriceChange={(value) => {
                   setMinPrice(value.replace(/[^\d]/g, ""));
                   setPage(1);
+                  setAccumulatedProducts([]);
                 }}
                 onMaxPriceChange={(value) => {
                   setMaxPrice(value.replace(/[^\d]/g, ""));
                   setPage(1);
+                  setAccumulatedProducts([]);
                 }}
                 onMinRatingChange={(value) => {
                   setMinRating(value);
                   setPage(1);
+                  setAccumulatedProducts([]);
                 }}
                 onDiscountChange={(value) => {
                   setDiscountOnly(value);
                   setPage(1);
+                  setAccumulatedProducts([]);
                 }}
                 onClear={clearFilters}
               />
             </div>
           </aside>
 
+          {/* Main Product Grid & Controls */}
           <section className="space-y-5">
-            <div className="flex flex-col gap-3 rounded-[28px] border border-stone-200 bg-white/90 p-4 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:flex-row sm:items-center sm:justify-between">
+            {/* Search & Sort Bar */}
+            <div className="flex flex-col gap-3 rounded-[24px] sm:rounded-[28px] border border-stone-200 bg-white/90 p-3.5 sm:p-4 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:flex-row sm:items-center sm:justify-between">
               <div className="relative flex-1">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
                 <input
@@ -434,15 +551,16 @@ export function CategoryPageClient({
                   onChange={(event) => {
                     setSearch(event.target.value);
                     setPage(1);
+                    setAccumulatedProducts([]);
                   }}
-                  placeholder="Search this catalog"
-                  className="h-12 w-full rounded-2xl border border-stone-200 bg-white pl-11 pr-4 text-sm outline-none transition focus:border-stone-300"
+                  placeholder="Search in this catalog..."
+                  className="h-11 sm:h-12 w-full rounded-2xl border border-stone-200 bg-white pl-11 pr-4 text-xs sm:text-sm outline-none transition focus:border-stone-400"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2.5">
                 <Button
                   variant="secondary"
-                  className="gap-2 lg:hidden"
+                  className="gap-2 lg:hidden h-11 sm:h-12 rounded-2xl text-xs sm:text-sm"
                   onClick={() => setMobileFiltersOpen(true)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
@@ -454,8 +572,9 @@ export function CategoryPageClient({
                   onChange={(event) => {
                     setSort(event.target.value as SortOption);
                     setPage(1);
+                    setAccumulatedProducts([]);
                   }}
-                  className="h-12 rounded-2xl border border-stone-200 bg-white px-4 text-sm outline-none transition focus:border-stone-300"
+                  className="h-11 sm:h-12 rounded-2xl border border-stone-200 bg-white px-3 sm:px-4 text-xs sm:text-sm outline-none transition focus:border-stone-400"
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -466,27 +585,73 @@ export function CategoryPageClient({
               </div>
             </div>
 
-            {productsQuery.isLoading ? (
-              <SectionSkeleton cards={4} />
+            {/* Product Feed */}
+            {productsQuery.isLoading && currentProducts.length === 0 ? (
+              <SectionSkeleton cards={8} />
             ) : productsQuery.isError ? (
               <ErrorState
                 title="Category feed unavailable"
                 description="The product API did not respond for this category request."
                 onRetry={() => productsQuery.refetch()}
               />
-            ) : productsQuery.data?.data.length ? (
+            ) : currentProducts.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 gap-3 xl:grid-cols-3 xl:gap-5">
-                  {productsQuery.data.data.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                {/* 16-Product Desktop Grid (4 cols on xl, 3 on sm/lg, 2 on mobile) */}
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 xl:gap-4">
+                  {currentProducts.map((product, index) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      priority={index < 4}
+                    />
                   ))}
                 </div>
-                <Pagination
-                  page={productsQuery.data.pagination.page}
-                  totalPages={productsQuery.data.pagination.totalPages}
-                  isPending={isPending}
-                  onPageChange={(nextPage) => setPage(nextPage)}
-                />
+
+                {/* Mobile Infinite Scroll Sentinel & Loader */}
+                <div className="lg:hidden">
+                  <div ref={sentinelRef} className="h-6" />
+
+                  {isLoadingMore && (
+                    <div className="flex items-center justify-center gap-2 py-6 text-sm text-stone-500">
+                      <Loader2 className="h-5 w-5 animate-spin text-stone-800" />
+                      <span>Loading more gear...</span>
+                    </div>
+                  )}
+
+                  {/* Checkpoint pagination on mobile after 48-50 products to keep mobile speed instant */}
+                  {accumulatedProducts.length >= MOBILE_MAX_AUTO_SCROLL_PRODUCTS &&
+                  productsQuery.data?.pagination.hasMore ? (
+                    <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 text-center shadow-sm">
+                      <p className="text-xs text-stone-500 mb-3">
+                        Loaded 50 products for speed. Continue to next page?
+                      </p>
+                      <Button
+                        onClick={() => {
+                          const nextPage = page + 1;
+                          setPage(nextPage);
+                          setAccumulatedProducts([]);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="w-full rounded-xl"
+                      >
+                        Next Page ({page + 1}) &rarr;
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Desktop Pagination (Hidden on mobile for infinite scroll experience) */}
+                <div className="hidden lg:block pt-4">
+                  <Pagination
+                    page={productsQuery.data?.pagination.page || page}
+                    totalPages={productsQuery.data?.pagination.totalPages || 1}
+                    isPending={isPending}
+                    onPageChange={(nextPage) => {
+                      setPage(nextPage);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -500,9 +665,10 @@ export function CategoryPageClient({
         </div>
       </Container>
 
+      {/* Mobile Filters Drawer */}
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-stone-950/35 transition lg:hidden",
+          "fixed inset-0 z-50 bg-stone-950/40 backdrop-blur-sm transition lg:hidden",
           mobileFiltersOpen
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0",
@@ -511,7 +677,7 @@ export function CategoryPageClient({
       />
       <div
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 rounded-t-[32px] border border-stone-200 bg-white p-5 shadow-[0_-20px_60px_rgba(15,23,42,0.15)] transition-transform duration-300 lg:hidden",
+          "fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-[32px] border border-stone-200 bg-white p-6 shadow-[0_-20px_60px_rgba(15,23,42,0.2)] transition-transform duration-300 lg:hidden",
           mobileFiltersOpen ? "translate-y-0" : "translate-y-full",
         )}
       >
@@ -526,22 +692,27 @@ export function CategoryPageClient({
           onSearchChange={(value) => {
             setSearch(value);
             setPage(1);
+            setAccumulatedProducts([]);
           }}
           onMinPriceChange={(value) => {
             setMinPrice(value.replace(/[^\d]/g, ""));
             setPage(1);
+            setAccumulatedProducts([]);
           }}
           onMaxPriceChange={(value) => {
             setMaxPrice(value.replace(/[^\d]/g, ""));
             setPage(1);
+            setAccumulatedProducts([]);
           }}
           onMinRatingChange={(value) => {
             setMinRating(value);
             setPage(1);
+            setAccumulatedProducts([]);
           }}
           onDiscountChange={(value) => {
             setDiscountOnly(value);
             setPage(1);
+            setAccumulatedProducts([]);
           }}
           onClear={clearFilters}
           onClose={() => setMobileFiltersOpen(false)}
