@@ -216,15 +216,12 @@ export function Navbar() {
         </div>
       ) : null}
 
-      <div aria-hidden={!mobileOpen} className={cn(mobileOpen ? "" : "pointer-events-none")}>
+      {mobileOpen ? (
         <aside
           role="dialog"
           aria-modal="true"
           aria-label="Mobile Navigation Menu"
-          className={cn(
-            "fixed inset-0 z-[60] flex h-[100dvh] w-screen flex-col bg-white transition-transform duration-300 lg:hidden",
-            mobileOpen ? "translate-x-0" : "-translate-x-full",
-          )}
+          className="fixed inset-0 z-[60] flex h-[100dvh] w-screen flex-col bg-white lg:hidden"
         >
           <Container className="flex h-[72px] shrink-0 items-center justify-between border-b border-stone-200">
             <Link href="/" aria-label="Quulix home" onClick={() => setMobileOpen(false)}>
@@ -249,7 +246,7 @@ export function Navbar() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search products"
-                  className="h-12 w-full rounded-full border border-stone-200 bg-stone-50 pl-11 pr-4 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:bg-white"
+                  className="h-12 w-full rounded-full border border-stone-200 bg-stone-50 pl-11 pr-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:bg-white"
                 />
               </form>
 
@@ -288,7 +285,7 @@ export function Navbar() {
             </Container>
           </div>
         </aside>
-      </div>
+      ) : null}
     </header>
     </>
   );

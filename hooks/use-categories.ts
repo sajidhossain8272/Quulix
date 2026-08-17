@@ -3,7 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { categoriesQueryOptions } from "@/services/api/catalog";
+import type { CategoriesResponse } from "@/lib/types";
 
-export function useCategories() {
-  return useQuery(categoriesQueryOptions());
+export function useCategories(options?: { initialData?: CategoriesResponse }) {
+  return useQuery({
+    ...categoriesQueryOptions(),
+    initialData: options?.initialData,
+  });
 }

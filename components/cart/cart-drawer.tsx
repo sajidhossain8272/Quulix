@@ -63,12 +63,12 @@ export function CartDrawer() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [closeCart, isOpen]);
+  }, [isOpen, closeCart]);
 
   const getCartTitle = () => {
-    if (!hasHydrated) return "Loading cart";
-    if (itemCount === 1) return "1 item";
-    return `${itemCount} items`;
+    if (!hasHydrated) return "Loading your bag";
+    if (items.length === 0) return "Your bag is empty";
+    return `${itemCount} item${itemCount === 1 ? "" : "s"} ready`;
   };
 
   const renderContent = () => {
@@ -79,9 +79,9 @@ export function CartDrawer() {
     if (items.length === 0) {
       return (
         <EmptyState
-          title="Your cart is empty"
-          description="Add products from any category shelf and they will appear here instantly."
-          actionLabel="Shop all categories"
+          title="No products yet"
+          description="Browse headphones, workspace gear, and travel audio to build your dream setup."
+          actionLabel="Explore catalog"
           onAction={closeCart}
         />
       );
@@ -102,7 +102,7 @@ export function CartDrawer() {
         <Link
           href="/category/all"
           onClick={closeCart}
-          className="flex w-full items-center justify-center rounded-full bg-stone-950 px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-stone-800"
+          className="flex w-full items-center justify-center rounded-full bg-stone-950 px-4 py-3 min-h-[44px] text-sm font-semibold text-white transition hover:bg-stone-800"
         >
           Explore products
         </Link>
@@ -126,32 +126,26 @@ export function CartDrawer() {
           label: "View full cart",
           onClick: closeCart,
         }}
-        note="Quulix uses a mock checkout flow here, but the cart totals and persisted line items are fully functional."
+        note="Cash on Delivery available across Bangladesh."
       />
     );
   };
+
+  if (!isOpen) return null;
 
   return (
     <>
       <div
         aria-hidden="true"
         onClick={closeCart}
-        className={
-          isOpen
-            ? "fixed inset-0 z-[70] bg-stone-950/40 backdrop-blur-sm"
-            : "pointer-events-none fixed inset-0 z-[70] bg-transparent opacity-0"
-        }
+        className="fixed inset-0 z-[70] bg-stone-950/40 backdrop-blur-sm"
       />
       <aside
         id="cart-drawer"
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-drawer-title"
-        className={
-          isOpen
-            ? "fixed inset-y-0 right-0 z-[80] flex w-full max-w-xl translate-x-0 flex-col border-l border-stone-200 bg-[#faf8f4] shadow-[-24px_0_80px_rgba(15,23,42,0.18)] transition-transform duration-300"
-            : "fixed inset-y-0 right-0 z-[80] flex w-full max-w-xl translate-x-full flex-col border-l border-stone-200 bg-[#faf8f4] shadow-[-24px_0_80px_rgba(15,23,42,0.18)] transition-transform duration-300"
-        }
+        className="fixed inset-y-0 right-0 z-[80] flex w-full max-w-xl translate-x-0 flex-col border-l border-stone-200 bg-[#faf8f4] shadow-[-24px_0_80px_rgba(15,23,42,0.18)]"
       >
         <div className="flex items-center justify-between border-b border-stone-200 px-5 py-4 sm:px-6">
           <div>

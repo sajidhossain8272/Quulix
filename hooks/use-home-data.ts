@@ -3,7 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { homeQueryOptions } from "@/services/api/catalog";
+import type { HomeResponse } from "@/lib/types";
 
-export function useHomeData() {
-  return useQuery(homeQueryOptions());
+export function useHomeData(options?: { initialData?: HomeResponse }) {
+  return useQuery({
+    ...homeQueryOptions(),
+    initialData: options?.initialData,
+  });
 }

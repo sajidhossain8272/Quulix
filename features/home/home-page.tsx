@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { CategorySection } from "@/components/products/category-section";
 import { DealsSection } from "@/components/products/deals-section";
 import { HeroSlider } from "@/components/marketing/hero-slider";
@@ -16,24 +14,27 @@ import { SectionSkeleton } from "@/components/ui/section-skeleton";
 import { useCategories } from "@/hooks/use-categories";
 import { useHomeData } from "@/hooks/use-home-data";
 import { DEFAULT_STORE_SETTINGS, type StoreSettings } from "@/lib/shop-settings";
+import type { Category, HomeResponse } from "@/lib/types";
 
-export function HomePage() {
-  const homeQuery = useHomeData();
-  const categoriesQuery = useCategories();
-  const [settings, setSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
+type HomePageProps = {
+  initialHomeData?: HomeResponse;
+  initialCategories?: Category[];
+  initialSettings?: StoreSettings;
+};
 
-  useEffect(() => {
-    fetch("/api/shop-settings")
-      .then((res) => res.json())
-      .then((data: StoreSettings) => {
-        if (data && data.storeName) {
-          setSettings((prev) => ({ ...prev, ...data }));
-        }
-      })
-      .catch(() => {});
-  }, []);
+export function HomePage({
+  initialHomeData,
+  initialCategories,
+  initialSettings,
+}: HomePageProps) {
+  const homeQuery = useHomeData(initialHomeData ? { initialData: initialHomeData } : undefined);
+  const categoriesQuery = useCategories(initialCategories ? { initialData: { data: initialCategories } } : undefined);
+  const settings = initialSettings || DEFAULT_STORE_SETTINGS;
 
-  if (homeQuery.isLoading) {
+  const currentHomeData = homeQuery.data || initialHomeData;
+  const currentCategories = categoriesQuery.data?.data || initialCategories || [];
+
+  if (homeQuery.isLoading && !currentHomeData) {
     return (
       <main className="pb-16 sm:pb-20">
         <HeroSlider />
@@ -45,7 +46,7 @@ export function HomePage() {
     );
   }
 
-  if (homeQuery.isError || !homeQuery.data) {
+  if ((homeQuery.isError || !currentHomeData) && !initialHomeData) {
     return (
       <main className="pb-16 sm:pb-20">
         <HeroSlider />
@@ -56,9 +57,7 @@ export function HomePage() {
             onRetry={() => homeQuery.refetch()}
           />
         </Container>
-        <BrandVideoSection
-          youtubeVideoId={settings.brandStoryVideoId}
-        />
+        <BrandVideoSection youtubeVideoId={settings.brandStoryVideoId} />
         <CinematicShowcase
           image={settings.showcaseImage}
           badge={settings.showcaseBadge}
@@ -76,49 +75,44 @@ export function HomePage() {
     );
   }
 
-  const orderedCategories = homeQuery.data.featuredCategorySlugs
-    .map((slug) => categoriesQuery.data?.data.find((category) => category.slug === slug))
+  const activeHomeData = currentHomeData!;
+  const orderedCategories = activeHomeData.featuredCategorySlugs
+    .map((slug) => currentCategories.find((category) => category.slug === slug))
     .filter((category): category is NonNullable<typeof category> => Boolean(category));
 
   return (
     <main className="pb-8 sm:pb-12">
-      {/* 1. Top Hero Slider Banner (Always visible & interactive) */}
-      <HeroSlider slides={homeQuery.data.heroSlides} />
+      {/* 1. Top Hero Slider Banner (Pre-rendered on Server for instant LCP) */}
+      <HeroSlider slides={activeHomeData.heroSlides} />
 
       {/* 2. Category Mosaic */}
-      {categoriesQuery.data?.data ? (
-        <CategoryMosaic categories={categoriesQuery.data.data} />
+      {currentCategories.length > 0 ? (
+        <CategoryMosaic categories={currentCategories} />
       ) : null}
 
       {/* 3. Featured Deals Sections */}
       <Container className="space-y-12 pt-8 sm:space-y-16 sm:pt-10">
         <DealsSection
           id="best-deals"
-          title={homeQuery.data.sections.bestDeals.title}
-          description={homeQuery.data.sections.bestDeals.description}
-          collection={homeQuery.data.sections.bestDeals.collection}
+          title={activeHomeData.sections.bestDeals.title}
+          description={activeHomeData.sections.bestDeals.description}
+          collection={activeHomeData.sections.bestDeals.collection}
         />
         <DealsSection
           id="seasonal-deals"
-          title={homeQuery.data.sections.seasonal.title}
-          description={homeQuery.data.sections.seasonal.description}
-          collection={homeQuery.data.sections.seasonal.collection}
+          title={activeHomeData.sections.seasonal.title}
+          description={activeHomeData.sections.seasonal.description}
+          collection={activeHomeData.sections.seasonal.collection}
         />
       </Container>
 
       {/* 4. Category Shelves */}
       <Container className="space-y-12 pt-12 sm:space-y-16 sm:pt-16">
-        {categoriesQuery.isLoading ? (
+        {categoriesQuery.isLoading && currentCategories.length === 0 ? (
           <>
             <SectionSkeleton cards={4} />
             <SectionSkeleton cards={4} />
           </>
-        ) : categoriesQuery.isError ? (
-          <ErrorState
-            title="Category shelves unavailable"
-            description="The category API is connected, but the homepage could not render the live category shelves."
-            onRetry={() => categoriesQuery.refetch()}
-          />
         ) : (
           orderedCategories.map((category) => (
             <CategorySection key={category.id} category={category} />
@@ -126,12 +120,10 @@ export function HomePage() {
         )}
       </Container>
 
-      {/* 5. Brand Craft YouTube Video & Story Section (Screenshot 1) */}
-      <BrandVideoSection
-        youtubeVideoId={settings.brandStoryVideoId}
-      />
+      {/* 5. Brand Craft YouTube Video & Story Section */}
+      <BrandVideoSection youtubeVideoId={settings.brandStoryVideoId} />
 
-      {/* 6. Cinematic Craftsmanship Showcase Visual / Footer Banner (Screenshot 4 - Balanced & Editable) */}
+      {/* 6. Cinematic Craftsmanship Showcase Visual / Footer Banner */}
       <CinematicShowcase
         image={settings.showcaseImage}
         badge={settings.showcaseBadge}
@@ -144,10 +136,10 @@ export function HomePage() {
         btn2Href={settings.showcaseBtn2Href}
       />
 
-      {/* 7. Latest Articles / Blogs for SEO (Screenshot 3) */}
+      {/* 7. Latest Articles / Blogs for SEO */}
       <BlogSection />
 
-      {/* 8. 3-Pillar Value Propositions Bar (Screenshot 2) */}
+      {/* 8. 3-Pillar Value Propositions Bar */}
       <ValueProps />
     </main>
   );
