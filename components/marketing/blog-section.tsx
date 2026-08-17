@@ -75,7 +75,7 @@ const articles: Article[] = [
 
 export function BlogSection() {
   return (
-    <section aria-labelledby="latest-articles-heading" className="py-14 sm:py-18 lg:py-22">
+    <section aria-labelledby="latest-articles-heading" className="content-auto py-14 sm:py-18 lg:py-22">
       <Container>
         {/* Section Header */}
         <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left pb-8 sm:pb-12 border-b border-stone-200">

@@ -35,7 +35,7 @@ export function CinematicShowcase({
   return (
     <section
       aria-label="Studio Craftsmanship Showcase"
-      className="py-8 sm:py-12"
+      className="content-auto py-8 sm:py-12"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

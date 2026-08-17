@@ -27,7 +27,7 @@ const valueProps = [
 
 export function ValueProps() {
   return (
-    <section aria-label="Brand value propositions" className="py-14 sm:py-18 bg-white/60 border-y border-stone-200/80">
+    <section aria-label="Brand value propositions" className="content-auto py-14 sm:py-18 bg-white/60 border-y border-stone-200/80">
       <Container>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-10 lg:gap-12">
           {valueProps.map((item) => {

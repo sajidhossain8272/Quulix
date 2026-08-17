@@ -106,7 +106,7 @@ export function HomePage({
         />
       </Container>
 
-      {/* 4. Category Shelves */}
+      {/* 4. Curated Category Shelves */}
       <Container className="space-y-12 pt-12 sm:space-y-16 sm:pt-16">
         {categoriesQuery.isLoading && currentCategories.length === 0 ? (
           <>
@@ -114,7 +114,7 @@ export function HomePage({
             <SectionSkeleton cards={4} />
           </>
         ) : (
-          orderedCategories.map((category) => (
+          orderedCategories.slice(0, 2).map((category) => (
             <CategorySection key={category.id} category={category} />
           ))
         )}

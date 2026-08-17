@@ -22,7 +22,7 @@ export function BrandVideoSection({
     "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1200&q=80";
 
   return (
-    <section aria-labelledby="brand-story-title" className="py-12 sm:py-16 lg:py-20">
+    <section aria-labelledby="brand-story-title" className="content-auto py-12 sm:py-16 lg:py-20">
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-16">
           {/* Left Column: YouTube / Craftsmanship Video */}

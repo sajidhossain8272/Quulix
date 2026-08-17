@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,7 +7,6 @@ import { useEffect, useEffectEvent, useState } from "react";
 
 import type { HeroSlide } from "@/lib/types";
 
-const swipeThreshold = 48;
 const AUTOPLAY_INTERVAL_MS = 5000;
 
 function wrapIndex(index: number, total: number) {
@@ -46,32 +44,31 @@ type HeroSliderProps = {
 
 export function HeroSlider({ slides = [] }: HeroSliderProps) {
   const activeSlides = slides.length > 0 ? slides : defaultFallbackSlides;
-  const shouldReduceMotion = useReducedMotion();
-  const [[current, direction], setCurrent] = useState<[number, number]>([0, 0]);
+  const [current, setCurrent] = useState(0);
 
   const advance = useEffectEvent(() => {
-    setCurrent(([index]) => [wrapIndex(index + 1, activeSlides.length), 1]);
+    setCurrent((index) => wrapIndex(index + 1, activeSlides.length));
   });
 
   useEffect(() => {
-    if (shouldReduceMotion || activeSlides.length < 2) return;
+    if (activeSlides.length < 2) return;
 
     const interval = window.setInterval(() => advance(), AUTOPLAY_INTERVAL_MS);
     return () => window.clearInterval(interval);
-  }, [shouldReduceMotion, activeSlides.length]);
+  }, [activeSlides.length]);
 
   const activeIndex = current >= activeSlides.length ? 0 : current;
 
   const goBackward = () => {
-    setCurrent(([index]) => [wrapIndex(index - 1, activeSlides.length), -1]);
+    setCurrent((index) => wrapIndex(index - 1, activeSlides.length));
   };
 
   const goForward = () => {
-    setCurrent(([index]) => [wrapIndex(index + 1, activeSlides.length), 1]);
+    setCurrent((index) => wrapIndex(index + 1, activeSlides.length));
   };
 
   const jumpTo = (index: number) => {
-    setCurrent(([currentIndex]) => [index, index > currentIndex ? 1 : -1]);
+    setCurrent(index);
   };
 
   const activeSlide = activeSlides[activeIndex];
@@ -94,7 +91,7 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
         fetchPriority="high"
         loading="eager"
         sizes="100vw"
-        quality={90}
+        quality={88}
         className={
           hasCopy
             ? "object-cover object-center"
@@ -114,68 +111,54 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
       aria-label="Featured collections carousel"
       className="relative isolate w-full overflow-hidden bg-stone-950 text-white aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[2.35/1] max-h-[720px] min-h-[300px] sm:min-h-[400px] md:min-h-[460px] lg:min-h-[520px]"
     >
-      <AnimatePresence initial={false} custom={direction} mode="wait">
-        <motion.div
-          key={activeSlide.id}
-          custom={direction}
-          initial={{ opacity: 0, x: direction >= 0 ? 24 : -24 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: direction >= 0 ? -24 : 24 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.4, ease: "easeOut" }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.15}
-          onDragEnd={(_, info) => {
-            if (info.offset.x <= -swipeThreshold) goForward();
-            if (info.offset.x >= swipeThreshold) goBackward();
-          }}
-          className="absolute inset-0"
-        >
-          {isClickableOnly && activeSlide.ctaHref ? (
-            <Link
-              href={activeSlide.ctaHref}
-              aria-label={activeSlide.alt || activeSlide.title || "Banner link"}
-              className="block h-full w-full"
-            >
-              {SlideImage}
-            </Link>
-          ) : (
-            SlideImage
-          )}
+      <div
+        key={activeSlide.id}
+        className="absolute inset-0 transition-opacity duration-500 ease-out"
+      >
+        {isClickableOnly && activeSlide.ctaHref ? (
+          <Link
+            href={activeSlide.ctaHref}
+            aria-label={activeSlide.alt || activeSlide.title || "Banner link"}
+            className="block h-full w-full"
+          >
+            {SlideImage}
+          </Link>
+        ) : (
+          SlideImage
+        )}
 
-          {hasCopy ? (
-            <div className="absolute inset-0 mx-auto flex w-full max-w-7xl items-end px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-              <div className="max-w-xl rounded-2xl border border-white/10 bg-stone-950/35 p-5 shadow-2xl backdrop-blur-md sm:p-7">
-                {activeSlide.eyebrow ? (
-                  <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-100">
-                    {activeSlide.eyebrow}
-                  </span>
-                ) : null}
-                {activeSlide.title ? (
-                  <h1 className="mt-3 font-display text-2xl tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
-                    {activeSlide.title}
-                  </h1>
-                ) : null}
-                {activeSlide.description ? (
-                  <p className="mt-3 max-w-lg text-xs leading-relaxed text-stone-100 sm:text-sm lg:text-base">
-                    {activeSlide.description}
-                  </p>
-                ) : null}
-                {activeSlide.ctaLabel && activeSlide.ctaHref ? (
-                  <Link
-                    href={activeSlide.ctaHref}
-                    className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 hover:bg-stone-100 min-h-[44px]"
-                  >
-                    {activeSlide.ctaLabel}
-                  </Link>
-                ) : null}
-              </div>
+        {hasCopy ? (
+          <div className="absolute inset-0 mx-auto flex w-full max-w-7xl items-end px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+            <div className="max-w-xl rounded-2xl border border-white/10 bg-stone-950/35 p-5 shadow-2xl backdrop-blur-md sm:p-7">
+              {activeSlide.eyebrow ? (
+                <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-100">
+                  {activeSlide.eyebrow}
+                </span>
+              ) : null}
+              {activeSlide.title ? (
+                <h1 className="mt-3 font-display text-2xl tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
+                  {activeSlide.title}
+                </h1>
+              ) : null}
+              {activeSlide.description ? (
+                <p className="mt-3 max-w-lg text-xs leading-relaxed text-stone-100 sm:text-sm lg:text-base">
+                  {activeSlide.description}
+                </p>
+              ) : null}
+              {activeSlide.ctaLabel && activeSlide.ctaHref ? (
+                <Link
+                  href={activeSlide.ctaHref}
+                  className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 hover:bg-stone-100 min-h-[44px]"
+                >
+                  {activeSlide.ctaLabel}
+                </Link>
+              ) : null}
             </div>
-          ) : null}
-        </motion.div>
-      </AnimatePresence>
+          </div>
+        ) : null}
+      </div>
 
-      {/* Slide Navigation Controls (Accessible touch targets) */}
+      {/* Slide Navigation Controls */}
       {activeSlides.length > 1 ? (
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-stone-950/70 p-1.5 backdrop-blur sm:bottom-6 sm:right-6">
           <button
