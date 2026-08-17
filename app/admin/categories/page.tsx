@@ -25,43 +25,45 @@ export default async function CategoriesPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left text-sm text-gray-500">
-          <thead className="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-100">
-            <tr>
-              <th className="px-6 py-4 font-medium">Name</th>
-              <th className="px-6 py-4 font-medium">Slug</th>
-              <th className="px-6 py-4 font-medium">Products</th>
-              <th className="px-6 py-4 font-medium text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {categories.length === 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-gray-500 min-w-[500px]">
+            <thead className="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-100">
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                  No categories found.
-                </td>
+                <th className="px-6 py-4 font-medium">Name</th>
+                <th className="px-6 py-4 font-medium">Slug</th>
+                <th className="px-6 py-4 font-medium">Products</th>
+                <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
-            ) : (
-              categories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50/50">
-                  <td className="px-6 py-4 font-medium text-gray-900">{category.name}</td>
-                  <td className="px-6 py-4">{category.slug}</td>
-                  <td className="px-6 py-4">{category._count.products}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-3">
-                      <Link
-                        href={`/admin/categories/${category.id}/edit`}
-                        className="text-gray-400 hover:text-black transition-colors"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Link>
-                    </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {categories.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                    No categories found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                categories.map((category) => (
+                  <tr key={category.id} className="hover:bg-gray-50/50">
+                    <td className="px-6 py-4 font-medium text-gray-900">{category.name}</td>
+                    <td className="px-6 py-4">{category.slug}</td>
+                    <td className="px-6 py-4">{category._count.products}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-3">
+                        <Link
+                          href={`/admin/categories/${category.id}/edit`}
+                          className="text-gray-400 hover:text-black transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

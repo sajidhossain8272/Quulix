@@ -45,7 +45,8 @@ export default async function ProductsPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left text-sm text-gray-500">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-gray-500 min-w-[600px]">
           <thead className="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-100">
             <tr>
               <th className="px-6 py-4 font-medium">Product</th>
@@ -108,6 +109,7 @@ export default async function ProductsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
