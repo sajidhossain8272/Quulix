@@ -24,7 +24,7 @@ const defaultFallbackSlides: HeroSlide[] = [
       "Discover refined noise cancellation, aerospace-grade materials, and deep discounts across premium audio.",
     ctaLabel: "Explore Headphones",
     ctaHref: "/category/headphones",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1920&q=85",
     alt: "Premium wireless headphones on a neutral surface",
   },
   {
@@ -35,7 +35,7 @@ const defaultFallbackSlides: HeroSlide[] = [
       "Minimal tools for sharper calls, better focus, and richer acoustics without visual clutter.",
     ctaLabel: "Shop Workspace",
     ctaHref: "/category/workspace",
-    image: "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?auto=format&fit=crop&w=1920&q=85",
     alt: "Modern workspace setup with clean desk accessories",
   },
 ];
@@ -82,11 +82,36 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
       (activeSlide.ctaLabel && activeSlide.ctaHref),
   );
 
+  const isClickableOnly = !hasCopy && Boolean(activeSlide.ctaHref);
+
+  const SlideImage = (
+    <div className="relative h-full w-full">
+      <Image
+        src={activeSlide.image}
+        alt={activeSlide.alt || activeSlide.title || "Featured Quulix collection"}
+        fill
+        priority
+        sizes="100vw"
+        quality={92}
+        className={
+          hasCopy
+            ? "object-cover object-center"
+            : "object-cover object-center sm:object-cover"
+        }
+      />
+      {hasCopy ? (
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-950/85 via-stone-950/40 to-transparent" />
+      ) : (
+        <div className="absolute inset-0 bg-stone-950/5 pointer-events-none" />
+      )}
+    </div>
+  );
+
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      className="relative isolate min-h-[420px] w-full overflow-hidden bg-stone-950 text-white sm:min-h-[540px] lg:min-h-[620px]"
+      className="relative isolate w-full overflow-hidden bg-stone-950 text-white aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[2.35/1] max-h-[720px] min-h-[300px] sm:min-h-[400px] md:min-h-[460px] lg:min-h-[520px]"
     >
       <AnimatePresence initial={false} custom={direction} mode="wait">
         <motion.div
@@ -105,45 +130,40 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
           }}
           className="absolute inset-0"
         >
-          <Image
-            src={activeSlide.image}
-            alt={activeSlide.alt || "Featured Quulix collection"}
-            fill
-            priority
-            sizes="100vw"
-            quality={88}
-            className={hasCopy ? "object-cover" : "object-cover brightness-[0.96]"}
-          />
-          <div
-            className={
-              hasCopy
-                ? "absolute inset-0 bg-gradient-to-r from-stone-950/80 via-stone-950/38 to-transparent"
-                : "absolute inset-0 bg-stone-950/10"
-            }
-          />
+          {isClickableOnly && activeSlide.ctaHref ? (
+            <Link
+              href={activeSlide.ctaHref}
+              aria-label={activeSlide.alt || "Banner link"}
+              className="block h-full w-full"
+            >
+              {SlideImage}
+            </Link>
+          ) : (
+            SlideImage
+          )}
 
           {hasCopy ? (
-            <div className="relative mx-auto flex min-h-[420px] w-full max-w-7xl items-end px-4 py-20 sm:min-h-[540px] sm:px-6 sm:py-24 lg:min-h-[620px] lg:px-8 lg:py-28">
-              <div className="max-w-xl rounded-2xl border border-white/10 bg-stone-950/28 p-5 shadow-2xl backdrop-blur-md sm:p-7">
+            <div className="absolute inset-0 mx-auto flex w-full max-w-7xl items-end px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+              <div className="max-w-xl rounded-2xl border border-white/10 bg-stone-950/35 p-5 shadow-2xl backdrop-blur-md sm:p-7">
                 {activeSlide.eyebrow ? (
                   <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-100">
                     {activeSlide.eyebrow}
                   </span>
                 ) : null}
                 {activeSlide.title ? (
-                  <h1 className="mt-4 font-display text-4xl tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  <h1 className="mt-3 font-display text-2xl tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
                     {activeSlide.title}
                   </h1>
                 ) : null}
                 {activeSlide.description ? (
-                  <p className="mt-4 max-w-lg text-sm leading-7 text-stone-100 sm:text-base">
+                  <p className="mt-3 max-w-lg text-xs leading-relaxed text-stone-100 sm:text-sm lg:text-base">
                     {activeSlide.description}
                   </p>
                 ) : null}
                 {activeSlide.ctaLabel && activeSlide.ctaHref ? (
                   <Link
                     href={activeSlide.ctaHref}
-                    className="mt-5 inline-flex items-center justify-center rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 hover:bg-stone-100"
+                    className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 hover:bg-stone-100"
                   >
                     {activeSlide.ctaLabel}
                   </Link>
@@ -154,8 +174,9 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
         </motion.div>
       </AnimatePresence>
 
+      {/* Slide Navigation Controls */}
       {activeSlides.length > 1 ? (
-        <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full border border-white/15 bg-stone-950/50 px-2 py-1.5 backdrop-blur sm:bottom-6 sm:right-6">
+        <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full border border-white/15 bg-stone-950/60 px-2 py-1.5 backdrop-blur sm:bottom-6 sm:right-6">
           <button
             type="button"
             aria-label="Previous banner"
@@ -172,7 +193,11 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
                 aria-label={`Show banner ${index + 1}`}
                 aria-current={index === activeIndex}
                 onClick={() => jumpTo(index)}
-                className={index === activeIndex ? "h-1.5 w-5 rounded-full bg-white" : "h-1.5 w-1.5 rounded-full bg-white/45"}
+                className={
+                  index === activeIndex
+                    ? "h-1.5 w-5 rounded-full bg-white"
+                    : "h-1.5 w-1.5 rounded-full bg-white/45"
+                }
               >
                 <span className="sr-only">Banner {index + 1}</span>
               </button>
