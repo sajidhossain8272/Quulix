@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { CategorySection } from "@/components/products/category-section";
 import { DealsSection } from "@/components/products/deals-section";
 import { HeroSlider } from "@/components/marketing/hero-slider";
@@ -13,10 +15,23 @@ import { ErrorState } from "@/components/ui/error-state";
 import { SectionSkeleton } from "@/components/ui/section-skeleton";
 import { useCategories } from "@/hooks/use-categories";
 import { useHomeData } from "@/hooks/use-home-data";
+import { DEFAULT_STORE_SETTINGS, type StoreSettings } from "@/lib/shop-settings";
 
 export function HomePage() {
   const homeQuery = useHomeData();
   const categoriesQuery = useCategories();
+  const [settings, setSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
+
+  useEffect(() => {
+    fetch("/api/shop-settings")
+      .then((res) => res.json())
+      .then((data: StoreSettings) => {
+        if (data && data.storeName) {
+          setSettings((prev) => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   if (homeQuery.isLoading) {
     return (
@@ -41,8 +56,20 @@ export function HomePage() {
             onRetry={() => homeQuery.refetch()}
           />
         </Container>
-        <BrandVideoSection />
-        <CinematicShowcase />
+        <BrandVideoSection
+          youtubeVideoId={settings.brandStoryVideoId}
+        />
+        <CinematicShowcase
+          image={settings.showcaseImage}
+          badge={settings.showcaseBadge}
+          eyebrow={settings.showcaseEyebrow}
+          title={settings.showcaseTitle}
+          description={settings.showcaseDescription}
+          btn1Label={settings.showcaseBtn1Label}
+          btn1Href={settings.showcaseBtn1Href}
+          btn2Label={settings.showcaseBtn2Label}
+          btn2Href={settings.showcaseBtn2Href}
+        />
         <BlogSection />
         <ValueProps />
       </main>
@@ -100,10 +127,22 @@ export function HomePage() {
       </Container>
 
       {/* 5. Brand Craft YouTube Video & Story Section (Screenshot 1) */}
-      <BrandVideoSection />
+      <BrandVideoSection
+        youtubeVideoId={settings.brandStoryVideoId}
+      />
 
-      {/* 6. Cinematic Craftsmanship Showcase Visual / GIF Section (Screenshot 4) */}
-      <CinematicShowcase />
+      {/* 6. Cinematic Craftsmanship Showcase Visual / Footer Banner (Screenshot 4 - Balanced & Editable) */}
+      <CinematicShowcase
+        image={settings.showcaseImage}
+        badge={settings.showcaseBadge}
+        eyebrow={settings.showcaseEyebrow}
+        title={settings.showcaseTitle}
+        description={settings.showcaseDescription}
+        btn1Label={settings.showcaseBtn1Label}
+        btn1Href={settings.showcaseBtn1Href}
+        btn2Label={settings.showcaseBtn2Label}
+        btn2Href={settings.showcaseBtn2Href}
+      />
 
       {/* 7. Latest Articles / Blogs for SEO (Screenshot 3) */}
       <BlogSection />

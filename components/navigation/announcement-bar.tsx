@@ -4,42 +4,60 @@ import { ChevronLeft, ChevronRight, Phone, ShieldCheck, Sparkles, Truck, X } fro
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const announcements = [
-  {
-    icon: Truck,
-    text: "Free Express Shipping Across Bangladesh on Orders Over ৳2,000",
-    linkText: "Shop Deals",
-    href: "/category/all?collection=best-deals",
-  },
-  {
-    icon: ShieldCheck,
-    text: "1-Year Official Replacement Warranty on All Audio & Tech Gear",
-    linkText: "Learn More",
-    href: "/category/all",
-  },
-  {
-    icon: Sparkles,
-    text: "Spring Acoustic Refresh: Up to 35% Off Premium Headphones & Speakers",
-    linkText: "Explore Now",
-    href: "/category/headphones",
-  },
-];
+import { DEFAULT_STORE_SETTINGS, type StoreSettings } from "@/lib/shop-settings";
 
 export function AnnouncementBar() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [settings, setSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
 
   useEffect(() => {
+    fetch("/api/shop-settings")
+      .then((res) => res.json())
+      .then((data: StoreSettings) => {
+        if (data && data.storeName) {
+          setSettings((prev) => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const dynamicAnnouncements = [
+    {
+      icon: Truck,
+      text: settings.announcementText1,
+      linkText: "Shop Deals",
+      href: "/category/all?collection=best-deals",
+    },
+    {
+      icon: ShieldCheck,
+      text: settings.announcementText2,
+      linkText: "Learn More",
+      href: "/shipping",
+    },
+    {
+      icon: Sparkles,
+      text: settings.announcementText3,
+      linkText: "Explore Now",
+      href: "/category/headphones",
+    },
+  ].filter((item) => Boolean(item.text));
+
+  useEffect(() => {
+    if (dynamicAnnouncements.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % announcements.length);
+      setCurrentIndex((prev) => (prev + 1) % dynamicAnnouncements.length);
     }, 4500);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [dynamicAnnouncements.length]);
 
-  if (!isVisible) return null;
+  if (!isVisible || !settings.isAnnouncementActive || dynamicAnnouncements.length === 0) {
+    return null;
+  }
 
-  const current = announcements[currentIndex];
+  const activeIndex = currentIndex >= dynamicAnnouncements.length ? 0 : currentIndex;
+  const current = dynamicAnnouncements[activeIndex];
   const Icon = current.icon;
 
   return (
@@ -53,25 +71,29 @@ export function AnnouncementBar() {
           <Phone className="h-3 w-3 text-stone-300" />
           <span>Hotline:</span>
           <a
-            href="tel:+8801755377017"
+            href={`tel:${settings.supportPhone}`}
             className="font-semibold text-stone-200 transition hover:text-white"
           >
-            +880 1755-377017
+            {settings.supportPhone}
           </a>
         </div>
 
         {/* Center: Dynamic Announcement */}
         <div className="flex flex-1 items-center justify-center gap-2 overflow-hidden px-2 text-center">
-          <button
-            type="button"
-            aria-label="Previous announcement"
-            onClick={() =>
-              setCurrentIndex((prev) => (prev - 1 + announcements.length) % announcements.length)
-            }
-            className="text-stone-400 transition hover:text-white"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </button>
+          {dynamicAnnouncements.length > 1 && (
+            <button
+              type="button"
+              aria-label="Previous announcement"
+              onClick={() =>
+                setCurrentIndex(
+                  (prev) => (prev - 1 + dynamicAnnouncements.length) % dynamicAnnouncements.length,
+                )
+              }
+              className="text-stone-400 transition hover:text-white"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+          )}
 
           <div className="flex items-center justify-center gap-1.5 truncate">
             <Icon className="h-3.5 w-3.5 shrink-0 text-amber-400" />
@@ -84,14 +106,16 @@ export function AnnouncementBar() {
             </Link>
           </div>
 
-          <button
-            type="button"
-            aria-label="Next announcement"
-            onClick={() => setCurrentIndex((prev) => (prev + 1) % announcements.length)}
-            className="text-stone-400 transition hover:text-white"
-          >
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
+          {dynamicAnnouncements.length > 1 && (
+            <button
+              type="button"
+              aria-label="Next announcement"
+              onClick={() => setCurrentIndex((prev) => (prev + 1) % dynamicAnnouncements.length)}
+              className="text-stone-400 transition hover:text-white"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Right: Currency / Quick Links & Dismiss */}
