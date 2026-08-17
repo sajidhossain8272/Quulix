@@ -67,7 +67,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-stone-800 bg-stone-950 text-stone-300">
+    <footer className="border-t border-stone-800 bg-stone-950 text-stone-200">
       {/* Main Footer Content */}
       <Container className="py-12 sm:py-16 lg:py-20">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-12">
@@ -83,25 +83,25 @@ export function Footer() {
               />
             </Link>
 
-            <p className="text-xs sm:text-sm leading-relaxed text-stone-400 max-w-sm">
+            <p className="text-xs sm:text-sm leading-relaxed text-stone-300 max-w-sm">
               {settings.storeName} is dedicated to acoustic mastery, refined tactile finishes, and uncompromised build quality. Elevating your daily tech and focus ritual.
             </p>
 
             {/* Address & Hotline */}
-            <div className="space-y-2 pt-1 text-xs sm:text-sm text-stone-400">
+            <div className="space-y-2.5 pt-1 text-xs sm:text-sm text-stone-300">
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
                 <span>{settings.studioAddress}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-amber-400" />
-                <a href={`tel:${settings.supportPhone}`} className="transition hover:text-white">
+                <a href={`tel:${settings.supportPhone}`} className="transition hover:text-white underline underline-offset-2">
                   {settings.supportPhone}
                 </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-amber-400" />
-                <a href={`mailto:${settings.supportEmail}`} className="transition hover:text-white">
+                <a href={`mailto:${settings.supportEmail}`} className="transition hover:text-white underline underline-offset-2">
                   {settings.supportEmail}
                 </a>
               </div>
@@ -113,34 +113,34 @@ export function Footer() {
             <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-white">
               Navigation
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-stone-400">
+            <ul className="space-y-1 text-xs sm:text-sm text-stone-300">
               <li>
-                <Link href="/category/all" className="transition hover:text-white">
+                <Link href="/category/all" className="inline-block py-1 transition hover:text-white">
                   &raquo; All Products
                 </Link>
               </li>
               <li>
-                <Link href="/category/headphones" className="transition hover:text-white">
+                <Link href="/category/headphones" className="inline-block py-1 transition hover:text-white">
                   &raquo; Headphones
                 </Link>
               </li>
               <li>
-                <Link href="/category/workspace" className="transition hover:text-white">
+                <Link href="/category/workspace" className="inline-block py-1 transition hover:text-white">
                   &raquo; Workspace Gear
                 </Link>
               </li>
               <li>
-                <Link href="/category/travel" className="transition hover:text-white">
+                <Link href="/category/travel" className="inline-block py-1 transition hover:text-white">
                   &raquo; Travel Audio
                 </Link>
               </li>
               <li>
-                <Link href="/category/all?collection=best-deals" className="transition hover:text-white">
+                <Link href="/category/all?collection=best-deals" className="inline-block py-1 transition hover:text-white">
                   &raquo; Best Deals
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="transition hover:text-white">
+                <Link href="/privacy" className="inline-block py-1 transition hover:text-white">
                   &raquo; Privacy Policy
                 </Link>
               </li>
@@ -152,34 +152,34 @@ export function Footer() {
             <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-white">
               Customer Care
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-stone-400">
+            <ul className="space-y-1 text-xs sm:text-sm text-stone-300">
               <li>
-                <Link href="/about" className="transition hover:text-white">
+                <Link href="/about" className="inline-block py-1 transition hover:text-white">
                   &raquo; About {settings.storeName}
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="transition hover:text-white">
+                <Link href="/shipping" className="inline-block py-1 transition hover:text-white">
                   &raquo; Shipping & Returns
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="transition hover:text-white">
+                <Link href="/terms" className="inline-block py-1 transition hover:text-white">
                   &raquo; Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/category/all" className="transition hover:text-white">
-                  &raquo; 1-Year Warranty Care
+                <Link href="/category/all" className="inline-block py-1 transition hover:text-white">
+                  &raquo; Warranty Care
                 </Link>
               </li>
               <li>
-                <Link href="/category/headphones" className="transition hover:text-white">
+                <Link href="/category/headphones" className="inline-block py-1 transition hover:text-white">
                   &raquo; Acoustic Quality
                 </Link>
               </li>
               <li>
-                <Link href={`tel:${settings.supportPhone}`} className="transition hover:text-white">
+                <Link href={`tel:${settings.supportPhone}`} className="inline-block py-1 transition hover:text-white">
                   &raquo; Direct Support
                 </Link>
               </li>
@@ -192,7 +192,7 @@ export function Footer() {
               <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-white">
                 Join the {settings.storeName} Journal
               </h4>
-              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-400">
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-stone-300">
                 Subscribe for private releases, acoustic breakdowns, and exclusive discounts.
               </p>
             </div>
@@ -206,16 +206,16 @@ export function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter Your Email"
-                  aria-label="Email for newsletter subscription"
-                  className="h-10 w-full rounded-lg border border-stone-700 bg-stone-900 px-3.5 text-xs sm:text-sm text-white placeholder-stone-500 outline-none transition focus:border-stone-400 focus:ring-1 focus:ring-stone-400"
+                  aria-label="Email address for newsletter"
+                  className="h-11 w-full rounded-lg border border-stone-700 bg-stone-900 px-3.5 text-xs sm:text-sm text-white placeholder-stone-400 outline-none transition focus:border-stone-300 focus:ring-1 focus:ring-stone-300"
                 />
               </div>
               <button
                 type="submit"
-                className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-stone-100 px-4 text-xs font-bold uppercase tracking-[0.12em] text-stone-950 transition hover:bg-white active:scale-[0.99]"
+                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-stone-100 px-4 text-xs font-bold uppercase tracking-[0.12em] text-stone-950 transition hover:bg-white active:scale-[0.99]"
               >
                 {subscribed ? (
-                  <span className="flex items-center gap-1.5 text-emerald-700">
+                  <span className="flex items-center gap-1.5 text-emerald-800">
                     <Check className="h-4 w-4" /> Subscribed!
                   </span>
                 ) : (
@@ -226,21 +226,21 @@ export function Footer() {
               </button>
             </form>
 
-            {/* Social Media Links */}
+            {/* Social Media Links (>= 44px Touch Targets) */}
             <div className="pt-2">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-2">
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-stone-300 mb-2">
                 Follow Our Studio
               </span>
-              <div className="flex items-center gap-2 text-stone-400">
+              <div className="flex items-center gap-2 text-stone-300">
                 {settings.facebookUrl && (
                   <a
                     href={settings.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Facebook"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-600 hover:bg-stone-800 hover:text-white"
+                    aria-label="Follow Quulix on Facebook"
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-500 hover:bg-stone-800 hover:text-white"
                   >
-                    <FacebookIcon className="h-3.5 w-3.5" />
+                    <FacebookIcon className="h-4 w-4" />
                   </a>
                 )}
                 {settings.instagramUrl && (
@@ -248,10 +248,10 @@ export function Footer() {
                     href={settings.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Instagram"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-600 hover:bg-stone-800 hover:text-white"
+                    aria-label="Follow Quulix on Instagram"
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-500 hover:bg-stone-800 hover:text-white"
                   >
-                    <InstagramIcon className="h-3.5 w-3.5" />
+                    <InstagramIcon className="h-4 w-4" />
                   </a>
                 )}
                 {settings.youtubeUrl && (
@@ -259,10 +259,10 @@ export function Footer() {
                     href={settings.youtubeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="YouTube"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-600 hover:bg-stone-800 hover:text-white"
+                    aria-label="Subscribe to Quulix on YouTube"
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-500 hover:bg-stone-800 hover:text-white"
                   >
-                    <YoutubeIcon className="h-3.5 w-3.5" />
+                    <YoutubeIcon className="h-4 w-4" />
                   </a>
                 )}
                 {settings.twitterUrl && (
@@ -270,10 +270,10 @@ export function Footer() {
                     href={settings.twitterUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Twitter / X"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-600 hover:bg-stone-800 hover:text-white"
+                    aria-label="Follow Quulix on Twitter X"
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-800 bg-stone-900 transition hover:border-stone-500 hover:bg-stone-800 hover:text-white"
                   >
-                    <XIcon className="h-3.5 w-3.5" />
+                    <XIcon className="h-4 w-4" />
                   </a>
                 )}
               </div>
@@ -283,9 +283,9 @@ export function Footer() {
       </Container>
 
       {/* Bottom Bar: Copyright & Payment Badges */}
-      <div className="border-t border-stone-900 bg-black/50 py-5">
+      <div className="border-t border-stone-900 bg-black/60 py-5">
         <Container className="flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
-          <p className="text-xs text-stone-500">
+          <p className="text-xs text-stone-300">
             {settings.storeName} &copy; {new Date().getFullYear()} All rights reserved. {settings.tagline}.
           </p>
 
@@ -294,7 +294,7 @@ export function Footer() {
             {["VISA", "Mastercard", "AMEX", "bKash", "Nagad", "SSLCommerz"].map((method) => (
               <span
                 key={method}
-                className="rounded border border-stone-800 bg-stone-900/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-stone-400"
+                className="rounded border border-stone-800 bg-stone-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-stone-300"
               >
                 {method}
               </span>

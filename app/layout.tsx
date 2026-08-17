@@ -19,24 +19,24 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://quulix.example.com"),
+  metadataBase: new URL("https://quulix.vercel.app"),
   title: {
     default: "Quulix | Premium Everyday Tech",
     template: "%s | Quulix",
   },
   description:
-    "A production-ready mobile-first commerce frontend for premium daily tech, built with Next.js App Router, React Query, Zustand, and mock API routes.",
+    "A production-ready mobile-first commerce experience for premium audio and everyday tech.",
   openGraph: {
     title: "Quulix",
     description:
-      "Premium commerce UI with Apple-inspired surfaces and Amazon-style product discovery.",
+      "Premium commerce UI with Apple-inspired surfaces and precision acoustic gear.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Quulix",
     description:
-      "Mobile-first commerce UI built for scalable API-first product discovery.",
+      "Premium everyday tech, acoustic gear, and modern workspace essentials.",
   },
 };
 
@@ -47,10 +47,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${fraunces.variable}`} data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
-      </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <Providers>{children}</Providers>
 

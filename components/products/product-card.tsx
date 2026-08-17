@@ -25,7 +25,7 @@ function getProductSpotlight(product: Product) {
     return {
       label: "New",
       className:
-        "border border-emerald-200/90 bg-emerald-50/95 text-emerald-700",
+        "border border-emerald-300 bg-emerald-50 text-emerald-800",
     };
   }
 
@@ -36,7 +36,7 @@ function getProductSpotlight(product: Product) {
   ) {
     return {
       label: "Hot",
-      className: "border border-rose-200/90 bg-rose-50/95 text-rose-700",
+      className: "border border-rose-300 bg-rose-50 text-rose-800",
     };
   }
 
@@ -107,10 +107,15 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
       className="group relative overflow-hidden rounded-[24px] border border-stone-200/80 bg-white/95 shadow-[0_12px_40px_rgba(15,23,42,0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
     >
       <div className="relative aspect-square overflow-hidden bg-stone-100">
-        <Link href={productHref} aria-label={`View ${product.title}`} className="absolute inset-0 block">
+        <Link
+          href={productHref}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="absolute inset-0 block"
+        >
           <Image
             src={currentImage}
-            alt={`${product.title} view ${activeImageIndex + 1}`}
+            alt=""
             fill
             priority={priority}
             loading={priority ? "eager" : "lazy"}
@@ -123,7 +128,7 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
 
         {/* Discount Badge */}
         {product.discountPercentage > 0 ? (
-          <span className="absolute left-3 top-3 z-10 rounded-full bg-stone-950/85 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-stone-950/90 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
             -{product.discountPercentage}%
           </span>
         ) : null}
@@ -140,33 +145,33 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
           </span>
         ) : null}
 
-        {/* Inner Image Indicators (shown when product has multiple images) */}
+        {/* Inner Image Indicators (avoiding non-composited width animation) */}
         {productImages.length > 1 ? (
-          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/30 px-2 py-1 backdrop-blur-md transition-opacity duration-300">
+          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 backdrop-blur-md">
             {productImages.map((_, idx) => (
               <span
                 key={idx}
                 className={cn(
-                  "h-1.5 rounded-full transition-all duration-300",
+                  "h-1.5 rounded-full transition-opacity duration-200",
                   idx === activeImageIndex
-                    ? "w-4 bg-white"
-                    : "w-1.5 bg-white/50 hover:bg-white/80",
+                    ? "w-3.5 bg-white opacity-100"
+                    : "w-1.5 bg-white/60 opacity-60 hover:opacity-90",
                 )}
               />
             ))}
           </div>
         ) : null}
 
-        {/* Action Icons Overlay on Hover (Matching Reference Design) */}
-        <div className="absolute right-3 top-3 z-20 flex flex-col items-center gap-2.5 rounded-xl border border-stone-100/80 bg-white/95 p-1.5 shadow-lg backdrop-blur-md transition-all duration-300 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0">
+        {/* Action Icons Overlay on Hover */}
+        <div className="absolute right-3 top-3 z-20 flex flex-col items-center gap-2 rounded-xl border border-stone-100/90 bg-white/95 p-1 shadow-lg backdrop-blur-md transition-all duration-300 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0">
           {/* Add to Cart Icon Button */}
           <button
             type="button"
             onClick={handleAddToCart}
-            title="Add to Cart"
-            aria-label="Add to Cart"
+            title={`Add ${product.title} to cart`}
+            aria-label={`Add ${product.title} to cart`}
             className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-lg text-stone-700 transition duration-200 hover:bg-stone-100 hover:text-stone-950",
+              "flex h-10 w-10 min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-stone-800 transition duration-200 hover:bg-stone-100 hover:text-stone-950",
               added && "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white",
             )}
           >
@@ -180,9 +185,9 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
           {/* Quick View Icon Button */}
           <Link
             href={productHref}
-            title="Quick View"
-            aria-label="Quick View"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-700 transition duration-200 hover:bg-stone-100 hover:text-stone-950"
+            title={`View details for ${product.title}`}
+            aria-label={`View details for ${product.title}`}
+            className="flex h-10 w-10 min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-stone-800 transition duration-200 hover:bg-stone-100 hover:text-stone-950"
           >
             <Eye className="h-4 w-4" />
           </Link>
@@ -190,9 +195,9 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
           {/* Compare Icon Button */}
           <button
             type="button"
-            title="Compare Product"
-            aria-label="Compare Product"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-700 transition duration-200 hover:bg-stone-100 hover:text-stone-950"
+            title={`Compare ${product.title}`}
+            aria-label={`Compare ${product.title}`}
+            className="flex h-10 w-10 min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-stone-800 transition duration-200 hover:bg-stone-100 hover:text-stone-950"
           >
             <ArrowRightLeft className="h-4 w-4" />
           </button>
@@ -205,10 +210,10 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
               e.stopPropagation();
               setIsWishlisted(!isWishlisted);
             }}
-            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
-            aria-label="Wishlist"
+            title={isWishlisted ? `Remove ${product.title} from Wishlist` : `Add ${product.title} to Wishlist`}
+            aria-label={isWishlisted ? `Remove ${product.title} from Wishlist` : `Add ${product.title} to Wishlist`}
             className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-lg text-stone-700 transition duration-200 hover:bg-stone-100 hover:text-stone-950",
+              "flex h-10 w-10 min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-stone-800 transition duration-200 hover:bg-stone-100 hover:text-stone-950",
               isWishlisted && "text-rose-600 hover:text-rose-700",
             )}
           >
@@ -221,8 +226,8 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
 
       {/* Product Details Section */}
       <div className="space-y-2 p-4">
-        <h3 className="text-sm font-medium leading-tight text-stone-900 line-clamp-1">
-          <Link href={productHref} className="transition hover:text-stone-600">
+        <h3 className="text-sm font-semibold leading-tight text-stone-950 line-clamp-1">
+          <Link href={productHref} className="transition hover:text-amber-700">
             {product.title}
           </Link>
         </h3>
@@ -232,7 +237,7 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
             {formatCurrency(product.price)}
           </span>
           {product.originalPrice > product.price ? (
-            <span className="text-xs text-stone-400 line-through">
+            <span className="text-xs text-stone-500 line-through">
               {formatCurrency(product.originalPrice)}
             </span>
           ) : null}
@@ -241,5 +246,3 @@ export function ProductCard({ product, priority, onHoverChange }: ProductCardPro
     </article>
   );
 }
-
-

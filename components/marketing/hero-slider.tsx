@@ -91,8 +91,10 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
         alt={activeSlide.alt || activeSlide.title || "Featured Quulix collection"}
         fill
         priority
+        fetchPriority="high"
+        loading="eager"
         sizes="100vw"
-        quality={92}
+        quality={90}
         className={
           hasCopy
             ? "object-cover object-center"
@@ -109,8 +111,9 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
 
   return (
     <section
+      role="region"
       aria-roledescription="carousel"
-      aria-label="Featured collections"
+      aria-label="Featured collections hero slider"
       className="relative isolate w-full overflow-hidden bg-stone-950 text-white aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[2.35/1] max-h-[720px] min-h-[300px] sm:min-h-[400px] md:min-h-[460px] lg:min-h-[520px]"
     >
       <AnimatePresence initial={false} custom={direction} mode="wait">
@@ -120,7 +123,7 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
           initial={{ opacity: 0, x: direction >= 0 ? 24 : -24 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direction >= 0 ? -24 : 24 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: "easeOut" }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.4, ease: "easeOut" }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.15}
@@ -133,7 +136,7 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
           {isClickableOnly && activeSlide.ctaHref ? (
             <Link
               href={activeSlide.ctaHref}
-              aria-label={activeSlide.alt || "Banner link"}
+              aria-label={activeSlide.alt || activeSlide.title || "Banner link"}
               className="block h-full w-full"
             >
               {SlideImage}
@@ -163,7 +166,7 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
                 {activeSlide.ctaLabel && activeSlide.ctaHref ? (
                   <Link
                     href={activeSlide.ctaHref}
-                    className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 hover:bg-stone-100"
+                    className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-stone-950 transition hover:-translate-y-0.5 hover:bg-stone-100 min-h-[44px]"
                   >
                     {activeSlide.ctaLabel}
                   </Link>
@@ -174,42 +177,46 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Slide Navigation Controls */}
+      {/* Slide Navigation Controls (Accessible touch targets) */}
       {activeSlides.length > 1 ? (
-        <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full border border-white/15 bg-stone-950/60 px-2 py-1.5 backdrop-blur sm:bottom-6 sm:right-6">
+        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-stone-950/70 p-1.5 backdrop-blur sm:bottom-6 sm:right-6">
           <button
             type="button"
-            aria-label="Previous banner"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/25"
+            aria-label="Previous banner slide"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/25 active:scale-95"
             onClick={goBackward}
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-1.5">
+
+          <div className="flex items-center gap-1 px-1">
             {activeSlides.map((slide, index) => (
               <button
                 key={slide.id}
                 type="button"
-                aria-label={`Show banner ${index + 1}`}
+                aria-label={`Go to slide ${index + 1}`}
                 aria-current={index === activeIndex}
                 onClick={() => jumpTo(index)}
-                className={
-                  index === activeIndex
-                    ? "h-1.5 w-5 rounded-full bg-white"
-                    : "h-1.5 w-1.5 rounded-full bg-white/45"
-                }
+                className="flex h-11 min-w-[28px] items-center justify-center p-1"
               >
-                <span className="sr-only">Banner {index + 1}</span>
+                <span
+                  className={
+                    index === activeIndex
+                      ? "h-2 w-6 rounded-full bg-white transition-opacity"
+                      : "h-2 w-2 rounded-full bg-white/40 hover:bg-white/70 transition-opacity"
+                  }
+                />
               </button>
             ))}
           </div>
+
           <button
             type="button"
-            aria-label="Next banner"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/25"
+            aria-label="Next banner slide"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/25 active:scale-95"
             onClick={goForward}
           >
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
       ) : null}

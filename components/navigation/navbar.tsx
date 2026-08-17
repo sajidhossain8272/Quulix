@@ -58,7 +58,7 @@ export function Navbar() {
         type="button"
         aria-expanded={openCategory === category.id}
         className={cn(
-          "flex h-10 items-center gap-1 whitespace-nowrap rounded-md px-2.5 text-xs font-bold uppercase tracking-[0.06em] text-stone-700 transition hover:bg-stone-100 hover:text-stone-950",
+          "flex h-11 min-h-[44px] items-center gap-1 whitespace-nowrap rounded-md px-2.5 text-xs font-bold uppercase tracking-[0.06em] text-stone-700 transition hover:bg-stone-100 hover:text-stone-950",
           openCategory === category.id && "bg-stone-100 text-stone-950",
         )}
         onClick={() => setOpenCategory((current) => (current === category.id ? null : category.id))}
@@ -77,15 +77,15 @@ export function Navbar() {
             >
               <span className="block text-sm font-semibold text-stone-950">Shop {category.name}</span>
               {category.tagline ? (
-                <span className="mt-0.5 block text-xs leading-5 text-stone-500">{category.tagline}</span>
+                <span className="mt-0.5 block text-xs leading-5 text-stone-600">{category.tagline}</span>
               ) : null}
             </Link>
             <Link
               href={`/category/${category.slug}`}
-              className="block rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-stone-700 transition hover:bg-stone-50"
+              className="block rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-stone-800 transition hover:bg-stone-50"
               onClick={() => setOpenCategory(null)}
             >
-              View collection
+              View {category.name} Collection
             </Link>
           </div>
         </div>
@@ -100,34 +100,34 @@ export function Navbar() {
       <Container>
         <div className="flex h-[72px] items-center justify-between lg:hidden">
           <Button
-            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={mobileOpen}
             variant="ghost"
-            className="h-11 w-11 rounded-full border border-stone-200 p-0"
+            className="h-11 w-11 min-h-[44px] min-w-[44px] rounded-full border border-stone-200 p-0"
             onClick={() => setMobileOpen((value) => !value)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
 
-          <Link href="/" aria-label="Quulix home">
+          <Link href="/" aria-label="Quulix home" className="flex items-center">
             <Image src="/logo.png" alt="Quulix" width={140} height={40} className="object-contain" priority />
           </Link>
 
           <div className="flex items-center gap-1">
             <Button
-              aria-label="Search products"
+              aria-label="Search catalog products"
               variant="ghost"
-              className="h-11 w-11 rounded-full border border-stone-200 p-0"
+              className="h-11 w-11 min-h-[44px] min-w-[44px] rounded-full border border-stone-200 p-0"
               onClick={() => setMobileOpen(true)}
             >
               <Search className="h-5 w-5" />
             </Button>
             <Button
-              aria-label="Open cart"
+              aria-label="Open shopping cart"
               aria-controls="cart-drawer"
               aria-expanded={isCartOpen}
               variant="secondary"
-              className="relative h-11 w-11 rounded-full p-0"
+              className="relative h-11 w-11 min-h-[44px] min-w-[44px] rounded-full p-0"
               onClick={handleCartOpen}
             >
               <ShoppingBag className="h-5 w-5" />
@@ -140,13 +140,13 @@ export function Navbar() {
           </div>
         </div>
 
-        <nav aria-label="Main navigation" className="relative hidden h-[76px] grid-cols-[minmax(0,1fr)_156px_minmax(0,1fr)] items-center lg:grid">
+        <nav aria-label="Main desktop navigation" className="relative hidden h-[76px] grid-cols-[minmax(0,1fr)_156px_minmax(0,1fr)] items-center lg:grid">
           <div className="flex min-w-0 items-center justify-end gap-1">
             <Button
-              aria-label="Search products"
+              aria-label="Search catalog products"
               aria-expanded={searchOpen}
               variant="ghost"
-              className="h-10 w-10 shrink-0 rounded-full p-0 text-stone-900 hover:bg-stone-100"
+              className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 rounded-full p-0 text-stone-900 hover:bg-stone-100"
               onClick={() => {
                 setSearchOpen((value) => !value);
                 setOpenCategory(null);
@@ -166,25 +166,25 @@ export function Navbar() {
             <Link
               href="/category/all"
               className={cn(
-                "ml-1 whitespace-nowrap rounded-md px-2.5 py-2 text-xs font-bold uppercase tracking-[0.06em] transition hover:bg-stone-100",
+                "ml-1 whitespace-nowrap rounded-md px-3 py-2.5 min-h-[44px] flex items-center text-xs font-bold uppercase tracking-[0.06em] transition hover:bg-stone-100",
                 pathname === "/category/all" ? "bg-stone-950 text-white hover:bg-stone-800" : "text-stone-700",
               )}
             >
               Shop all
             </Link>
             <Link
-              href="/category/all"
-              aria-label="Account"
-              className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-stone-800 transition hover:bg-stone-100"
+              href="/admin/products"
+              aria-label="Admin and User Account"
+              className="ml-1 flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-stone-800 transition hover:bg-stone-100"
             >
               <User className="h-5 w-5" />
             </Link>
             <Button
-              aria-label="Open cart"
+              aria-label="Open shopping cart"
               aria-controls="cart-drawer"
               aria-expanded={isCartOpen}
               variant="ghost"
-              className="relative h-10 w-10 shrink-0 rounded-full p-0 text-stone-900 hover:bg-stone-100"
+              className="relative h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 rounded-full p-0 text-stone-900 hover:bg-stone-100"
               onClick={handleCartOpen}
             >
               <ShoppingBag className="h-5 w-5" />
@@ -205,7 +205,7 @@ export function Navbar() {
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
               <input
                 autoFocus
-                aria-label="Search products"
+                aria-label="Search catalog products"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search products"
@@ -220,6 +220,7 @@ export function Navbar() {
         <aside
           role="dialog"
           aria-modal="true"
+          aria-label="Mobile Navigation Menu"
           className={cn(
             "fixed inset-0 z-[60] flex h-[100dvh] w-screen flex-col bg-white transition-transform duration-300 lg:hidden",
             mobileOpen ? "translate-x-0" : "-translate-x-full",
@@ -230,9 +231,9 @@ export function Navbar() {
               <Image src="/logo.png" alt="Quulix" width={140} height={40} className="object-contain" priority />
             </Link>
             <Button
-              aria-label="Close navigation"
+              aria-label="Close navigation menu"
               variant="ghost"
-              className="h-11 w-11 rounded-full border border-stone-200 p-0"
+              className="h-11 w-11 min-h-[44px] min-w-[44px] rounded-full border border-stone-200 p-0"
               onClick={() => setMobileOpen(false)}
             >
               <X className="h-5 w-5" />
@@ -244,8 +245,7 @@ export function Navbar() {
               <form onSubmit={handleSubmit} className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
                 <input
-                  autoFocus
-                  aria-label="Search products"
+                  aria-label="Search catalog products"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search products"
@@ -276,9 +276,9 @@ export function Navbar() {
               </div>
 
               <div className="mt-8 flex items-center gap-4 border-t border-stone-200 pt-6">
-                <Link href="/category/all" className="flex items-center gap-2 text-sm font-semibold text-stone-800" onClick={() => setMobileOpen(false)}>
+                <Link href="/admin/products" className="flex items-center gap-2 text-sm font-semibold text-stone-800" onClick={() => setMobileOpen(false)}>
                   <User className="h-4 w-4" />
-                  Account
+                  Admin Panel
                 </Link>
                 <button type="button" className="flex items-center gap-2 text-sm font-semibold text-stone-800" onClick={handleCartOpen}>
                   <ShoppingBag className="h-4 w-4" />
